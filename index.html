@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TinsmithAssist</title>
+<meta name="apple-mobile-web-app-title" content="TinAssist">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#c2410c">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+:root{--bg:#f6f6f4;--fg:#1d1d1b;--card:#fff;--bd:#d0d0c8;--ac:#c2410c;--mu:#6b6b64;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161615;--fg:#ecece8;--card:#222220;--bd:#3a3a36;--ac:#fb923c;--mu:#9a9a92}}
+:root[data-theme="dark"]{--bg:#161615;--fg:#ecece8;--card:#222220;--bd:#3a3a36;--ac:#fb923c;--mu:#9a9a92}
+*{box-sizing:border-box}
+html,body{margin:0;overscroll-behavior-y:contain}
+body{background:var(--bg);color:var(--fg);font:16px/1.4 system-ui,sans-serif;padding:12px;max-width:560px;margin:auto}
+h1{font-size:20px;margin:6px 0 12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:12px}
+h2{font-size:13px;margin:0 0 8px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em}
+input,select{width:100%;font:inherit;padding:9px 6px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--fg);text-align:center}
+label{display:block;font-size:13px;color:var(--mu);text-align:center}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+button{font:inherit;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--fg);padding:10px 14px}
+.menu{display:block;width:100%;text-align:left;font-size:18px;padding:16px}
+.back{margin-bottom:6px}
+table{width:100%;border-collapse:collapse}
+th{font-weight:400;font-size:13px;color:var(--mu);padding:0 3px 4px}
+td{padding:3px}
+.n{display:inline-flex;width:34px;height:34px;border:1.5px solid var(--fg);border-radius:50%;align-items:center;justify-content:center}
+.x{padding:6px 9px;color:var(--mu)}
+.add{width:100%;margin-top:8px;border-style:dashed}
+svg{width:100%;display:block;-webkit-tap-highlight-color:transparent}
+.card{position:relative}
+.clr{position:absolute;top:10px;right:10px;width:130px}
+.hint{font-size:12px;color:var(--mu);text-align:center;margin-top:6px}
+.ed{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:8px}
+.ed input{width:90px}
+.seg{cursor:pointer}
+
+[hidden]{display:none!important}
+button:disabled{opacity:.4}
+.sheet{background:#fff;color:#111;border:1px solid var(--bd);padding:14px;font-size:12px;line-height:1.35;min-height:380px}
+.sheet table{margin:4px 0 10px}.sheet th,.sheet td{border:1px solid #bbb;padding:2px 6px;text-align:center;font-size:12px;color:#111}
+.pg{width:210mm;height:297mm;background:#fff;color:#111;border:1px solid var(--bd);margin-bottom:14px;position:relative;overflow:hidden;font-size:10pt;line-height:1.3;box-sizing:border-box}
+.pc{padding:15mm 15mm 0;height:282mm;overflow:hidden}
+.pg table{margin:0 0 5mm;table-layout:fixed;width:100%}
+.pg th,.pg td{border:.4pt solid #888;padding:0 1mm;font-size:9pt;height:7mm;text-align:center;color:#111;font-weight:400}
+.pg th:first-child,.pg td:first-child{width:10mm}
+.cm{margin:2mm 0 1mm}.bt{margin-top:3mm;font-size:11pt}
+@page{size:A4;margin:0}
+@media print{body{background:#fff;padding:0;max-width:none}body>div:not(#prev){display:none!important}#prev>*:not(#sheet){display:none!important}#sheet{zoom:1!important}.pg{margin:0;border:0;break-after:page;page-break-after:always}.pg:last-child{break-after:auto;page-break-after:auto}}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--bd)}
+.row button{padding:6px 10px;font-size:14px}
+.big{display:block;width:100%;padding:14px;font-size:17px;margin-bottom:10px}
+.pri{background:var(--ac);color:#fff;border-color:var(--ac)}
+#toast{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:12px;border-radius:10px;text-align:center}
+.f{display:grid;gap:8px}.f label{text-align:left}.f input{text-align:left}
+</style><script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head><body>
+
+<div id="home">
+<h1>TinsmithAssist</h1>
+<button class="big pri" id="newO">Новый заказ</button>
+<button class="big" id="cont">Продолжить</button>
+<button class="big" id="viewO1">Посмотреть текущий</button>
+<div class="hint" id="stat" style="font-size:14px;margin:4px 0 10px"></div>
+<div class="hint">Недописанный заказ запоминается на телефоне.</div>
+</div>
+
+<div id="tpl" hidden>
+<button class="back" id="bkT">← Меню</button>
+<h1>Новый заказ</h1>
+<h2>Выбери шаблон</h2>
+<button class="menu" id="tplSill">Подоконники</button>
+<button class="menu" disabled style="margin-top:8px">Произвольные детали</button>
+<div class="hint">Другие шаблоны появятся здесь.</div>
+</div>
+
+<div id="hub" hidden>
+<button class="back" id="bk1">← Меню</button>
+<h1>Заказ</h1>
+<div class="card"><h2>Данные заказа</h2><div class="f">
+<label>Адрес<input id="oa" type="text"></label>
+<label>Имя<input id="on" type="text"></label>
+<label>Примечание<input id="oc" type="text"></label></div></div>
+<div class="card"><h2>Блоки</h2><div id="blist"></div>
+<h2 style="margin-top:14px">Добавить блок</h2>
+<button class="menu" id="goSill">Подоконники</button></div>
+<button class="big" id="viewO2">Посмотреть текущий</button>
+<button class="big" id="delO">Удалить заказ</button>
+</div>
+
+<div id="sill" hidden>
+<button class="back" id="bk2">← Назад</button>
+<h1 id="stitle">Подоконники</h1>
+<div class="card">
+<div class="clr"><label>Цвет<input id="clr" type="text" autocapitalize="characters" style="text-transform:uppercase"></label></div>
+<svg id="sk" viewBox="0 0 380 240" role="img"><title>Подоконник в объёме</title>
+<polygon points="40,150 235,150 312,105 160,105" fill="var(--ac)" opacity=".10"/>
+<polygon points="235,150 239.4,194.8 315.4,139.9 312,105" fill="var(--ac)" opacity=".18"/>
+<polygon points="40,150 35.3,101.6 156.3,67.3 160,105" fill="var(--ac)" opacity=".06"/>
+<g stroke="var(--mu)" stroke-width="1" fill="none" stroke-linejoin="round">
+<polyline points="156.3,67.3 160,105 312,105 315.4,139.9"/>
+<line x1="35.3" y1="101.6" x2="156.3" y2="67.3"/>
+<line x1="40" y1="150" x2="160" y2="105"/>
+<line x1="235" y1="150" x2="312" y2="105"/>
+<line x1="239.4" y1="194.8" x2="315.4" y2="139.9"/>
+</g>
+<g stroke="var(--mu)" stroke-width="1" fill="none" stroke-dasharray="4 3">
+<line x1="234.2" y1="177.45" x2="311.4" y2="126.4"/>
+<line x1="315.4" y1="139.9" x2="311.4" y2="126.4"/>
+</g>
+<line x1="40" y1="150" x2="235" y2="150" stroke="var(--fg)" stroke-width="2.5" stroke-linecap="round"/>
+<line id="s30" x1="40" y1="150" x2="35.3" y2="101.6" stroke="var(--fg)" stroke-width="2.5" stroke-linecap="round"/>
+<line id="s25" x1="235" y1="150" x2="239.4" y2="194.8" stroke="var(--fg)" stroke-width="2.5" stroke-linecap="round"/>
+<line id="s10" x1="239.4" y1="194.8" x2="234.2" y2="177.45" stroke="var(--fg)" stroke-width="2.5" stroke-linecap="round"/>
+<g class="seg" stroke="transparent" stroke-width="30" stroke-linecap="round">
+<line data-k="30" x1="40" y1="150" x2="35.3" y2="101.6"/>
+<line data-k="25" x1="235" y1="150" x2="239.4" y2="194.8"/>
+<line data-k="10" x1="239.4" y1="194.8" x2="234.2" y2="177.45"/>
+</g>
+<g font-size="15" font-family="system-ui,sans-serif" fill="var(--ac)" class="seg">
+<text data-k="30" id="t30" x="22" y="125" text-anchor="end">30</text>
+<text data-k="25" id="t25" x="253" y="202">25</text>
+<text data-k="10" id="t10" x="225" y="202" text-anchor="end">10</text>
+</g>
+<g font-size="15" font-family="system-ui,sans-serif" fill="var(--fg)">
+<text x="137" y="170" text-anchor="middle">a</text>
+<text x="236" y="95" text-anchor="middle">b</text>
+<text x="285" y="134" text-anchor="middle">l</text>
+</g>
+</svg>
+<div class="hint">Нажми на размер или отрезок, чтобы изменить (мм)</div>
+<div class="ed" id="ed" hidden><span id="edl"></span><input id="edi" type="number" inputmode="decimal"><button id="edok">Готово</button></div>
+</div>
+<div class="card">
+<h2>Размеры</h2>
+<div class="g3" style="margin-bottom:8px">
+<label>a, b<select id="ua"><option>мм</option><option>см</option><option>м</option></select></label>
+<label>l<select id="ul"><option>м</option><option>см</option><option>мм</option></select></label><span></span></div>
+<div id="lists"></div>
+<button class="add" id="addList">Добавить список</button>
+<div class="hint">b — только если подоконник клином (края разной ширины). шт — если не указано, 1.</div>
+</div>
+<button class="big pri" id="add">Добавить в заказ</button>
+<button class="big" id="pdf">Сохранить PDF</button>
+<button class="big pri" id="save" hidden>Сохранить изменения</button>
+<button class="big" id="cancel" hidden>Отмена</button>
+</div>
+
+<div id="prev" hidden>
+<button class="back" id="bk3">← Назад</button>
+<h1>Текущий заказ</h1>
+<div id="sheet"></div>
+<button class="big pri" id="pdf2" style="margin-top:12px">Сохранить PDF</button>
+<div class="hint" id="fname"></div>
+</div>
+<div id="toast" hidden></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const nl=()=>({c:'',rows:[{a:'',b:'',l:'',q:''}]});
+const nd=()=>({p:{30:30,25:25,10:10},clr:'',ua:'мм',ul:'м',lists:[nl()]});
+const cl=o=>JSON.parse(JSON.stringify(o));
+const mig=b=>{if(b&&b.rows&&!b.lists){b.lists=[{c:'',rows:b.rows}];delete b.rows}return b};
+const un=x=>({'мм':'mm','см':'cm','м':'m'}[x]||x);
+let order={active:false,addr:'',name:'',note:'',blocks:[]},draft=nd(),cur=draft,editing=null,sel=null,scr='home';
+const KEY='zamery-v1';
+function save(){try{localStorage.setItem(KEY,JSON.stringify({order,draft,editing,scr,cur:editing!==null?cur:null}))}catch(e){}}
+function restore(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(!s||!s.order)return;order=s.order;if(order.active===undefined)order.active=!!(order.blocks.length||order.addr||order.name||order.note);order.blocks=order.blocks.map(mig);draft=mig(s.draft);editing=s.editing;scr=s.scr==='sections'?'hub':(s.scr||'home');cur=(editing!==null&&s.cur)?mig(s.cur):draft}catch(e){}}
+['input','change','click'].forEach(t=>document.addEventListener(t,save));
+addEventListener('pagehide',save);document.addEventListener('visibilitychange',save);
+const d=new Date(),ds=String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();
+const rowsOf=b=>b.lists.flatMap(l=>l.rows);
+const filled=b=>rowsOf(b).filter(r=>r.a||r.l);
+const draftFilled=()=>draft.clr||draft.lists.some(l=>l.c||l.rows.some(r=>r.a||r.b||r.l||r.q));
+let from='home';
+const updHome=()=>{const a=order.active;$('cont').disabled=!a;$('viewO1').disabled=!a;$('cont').classList.toggle('pri',a);$('stat').textContent=a?'В работе: заказ от '+(order.date||ds)+', блоков: '+order.blocks.length:'Заказа в работе нет'};
+function showRaw(id){if(scr==='sill'&&id!=='sill'&&editing!==null){editing=null;cur=draft;load()}scr=id;['home','tpl','hub','sill','prev'].forEach(s=>$(s).hidden=s!==id);if(id==='prev')renderPrev();if(id==='hub')renderHub();if(id==='home')updHome();window.scrollTo(0,0);save()}
+function show(id){showRaw(id);const h=id==='home'?'':id;if(location.hash.slice(1)!==h)location.hash=h}
+addEventListener('hashchange',()=>{const id=location.hash.slice(1)||'home';if(['home','tpl','hub','sill','prev'].includes(id)&&id!==scr)showRaw(id)});
+function toast(t){const e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2200)}
+function two(b,label,fn){if(b.dataset.armed){clearTimeout(b._t);b.textContent=b.dataset.orig;delete b.dataset.armed;fn();return}b.dataset.orig=b.textContent;b.dataset.armed=1;b.textContent=label;b._t=setTimeout(()=>{b.textContent=b.dataset.orig;delete b.dataset.armed},3000)}
+function mark(k){['30','25','10'].forEach(n=>$('s'+n).setAttribute('stroke',n===k?'var(--ac)':'var(--fg)'))}
+function heads(){document.querySelectorAll('.ha').forEach(e=>e.textContent='a ('+cur.ua+')');document.querySelectorAll('.hb').forEach(e=>e.textContent='b ('+cur.ua+')');document.querySelectorAll('.hl').forEach(e=>e.textContent='l ('+cur.ul+')')}
+function lists(){
+  $('lists').innerHTML=cur.lists.map((L,li)=>`<div style="margin-bottom:16px">
+<div style="display:flex;gap:6px;margin-bottom:6px"><input data-li="${li}" data-k="c" value="${esc(L.c)}" placeholder="Комментарий к списку" style="text-align:left">${cur.lists.length>1?`<button class="x" data-dl="${li}">✕</button>`:''}</div>
+<table><thead><tr><th></th><th class="ha"></th><th class="hb"></th><th class="hl"></th><th>шт</th><th></th></tr></thead><tbody>`+
+  L.rows.map((r,i)=>`<tr><td><span class="n">${i+1}</span></td>
+<td><input data-li="${li}" data-i="${i}" data-k="a" value="${esc(r.a)}" inputmode="decimal"></td>
+<td><input data-li="${li}" data-i="${i}" data-k="b" value="${esc(r.b)}" inputmode="decimal"></td>
+<td><input data-li="${li}" data-i="${i}" data-k="l" value="${esc(r.l)}" inputmode="decimal"></td>
+<td><input data-li="${li}" data-i="${i}" data-k="q" value="${esc(r.q)}" placeholder="1" inputmode="numeric"></td>
+<td><button class="x" data-li="${li}" data-del="${i}" ${L.rows.length<2?'disabled':''}>✕</button></td></tr>`).join('')+
+  `</tbody></table><button class="add" data-addrow="${li}">Добавить позицию</button></div>`).join('');
+  heads();
+}
+function load(){
+  ['30','25','10'].forEach(k=>$('t'+k).textContent=cur.p[k]);
+  $('clr').value=cur.clr;$('ua').value=cur.ua;$('ul').value=cur.ul;lists();
+  $('ed').hidden=true;mark(null);sel=null;
+  const e=editing!==null;
+  $('add').hidden=e;$('pdf').hidden=e;$('save').hidden=!e;$('cancel').hidden=!e;
+  $('stitle').textContent=e?'Подоконники: правка':'Подоконники';
+}
+function sketch(p){
+  const P={T:[53.4,161.9],A:[56,188.5],B:[163.3,188.5],C:[165.7,213.1],E:[162.8,203.6],T2:[120,143],A2:[122,163.8],B2:[205.6,163.8],C2:[207.5,182.9],E2:[205.3,175.5]};
+  const pl=ks=>ks.map(k=>P[k].join(',')).join(' ');
+  return `<svg viewBox="30 134 195 94" style="width:87mm;display:block;margin:1mm 0 2mm"><polygon points="${pl(['A','B','B2','A2'])}" fill="#f6ece7"/><polygon points="${pl(['B','C','C2','B2'])}" fill="#efd6ca"/><polygon points="${pl(['A','T','T2','A2'])}" fill="#faf3ef"/><g stroke="#73726c" stroke-width=".8" fill="none"><polyline points="${pl(['T2','A2','B2','C2'])}"/><polyline points="${pl(['T','T2'])}"/><polyline points="${pl(['A','A2'])}"/><polyline points="${pl(['B','B2'])}"/><polyline points="${pl(['C','C2'])}"/></g><g stroke="#73726c" stroke-width=".8" stroke-dasharray="3 2"><polyline points="${pl(['E','E2'])}"/><polyline points="${pl(['C2','E2'])}"/></g><polyline points="${pl(['T','A','B','C','E'])}" fill="none" stroke="#1a1a18" stroke-width="1.8" stroke-linejoin="round"/><g font-size="10" fill="#111" font-family="sans-serif"><text x="46" y="176" text-anchor="end">${esc(p[30])}</text><text x="110" y="203" text-anchor="middle">a</text><text x="164" y="156" text-anchor="middle">b</text><text x="211" y="177">l</text><text x="157" y="222" text-anchor="end">${esc(p[10])}</text><text x="173" y="222">${esc(p[25])}</text></g></svg>`;
+}
+function renderSheet(){
+  const box=$('sheet');box.innerHTML='';box.style.zoom=1;
+  let pc;
+  const mk=()=>{const pg=document.createElement('div');pg.className='pg';pc=document.createElement('div');pc.className='pc';pg.appendChild(pc);box.appendChild(pg)};
+  const over=()=>pc.scrollHeight>pc.clientHeight+1;
+  const put=hs=>{const els=hs.map(h=>{const e=document.createElement('div');e.innerHTML=h;pc.appendChild(e);return e});if(over()){els.forEach(e=>pc.removeChild(e));return false}return true};
+  const frows=L=>L.rows.filter(r=>r.a||r.l);
+  const tbl=(b,rs,off)=>`<table><tr><th>Nr.</th><th>a (${un(b.ua)})</th><th>b (${un(b.ua)})</th><th>l (${un(b.ul)})</th><th>gab.</th></tr>`+rs.map((r,i)=>(r.b?`<tr><td>${off+i+1}</td><td>${esc(r.a)}</td><td>${esc(r.b)}</td>`:`<tr><td>${off+i+1}</td><td colspan="2">${esc(r.a)}</td>`)+`<td>${esc(r.l)}</td><td>${esc(r.q||1)}</td></tr>`).join('')+'</table>';
+  const listHtml=(b,L,mode,rs,off,head)=>{
+    const c=L.c?`<div class="cm"><i>${esc(L.c)}</i></div>`:'';
+    if(mode==='s'||rs.length<2)return head+c+tbl(b,rs,off);
+    const h=Math.ceil(rs.length/2);
+    return head+c+`<div style="display:flex;gap:4mm"><div style="flex:1">${tbl(b,rs.slice(0,h),off)}</div><div style="flex:1">${tbl(b,rs.slice(h),off+h)}</div></div>`;
+  };
+  const headOf=(b,sk)=>`<div class="bt"><b>Palodzes${b.clr?', krāsa '+esc(b.clr):''}</b></div>`+(sk?sketch(b.p):'');
+  const chunk=(b,L,rs,off,hd)=>{
+    for(let t=0;t<2;t++){
+      for(let n=rs.length-off;n>=1;n--)if(put([listHtml(b,L,'d',rs.slice(off,off+n),off,hd)]))return n;
+      if(t===0&&pc.children.length>0)mk();
+    }
+    const e=document.createElement('div');e.innerHTML=listHtml(b,L,'d',rs.slice(off,off+1),off,hd);pc.appendChild(e);return 1;
+  };
+  const placeLong=(b,L,first)=>{
+    const rs=frows(L);let off=0,f=true;
+    if(!first){
+      if(put([listHtml(b,L,'d',rs,0,'')]))return;
+      mk();
+    }
+    while(off<rs.length){off+=chunk(b,L,rs,off,headOf(b,f));f=false;if(off<rs.length)mk()}
+  };
+  mk();
+  let h=`<div style="display:flex;justify-content:space-between"><b style="font-size:14pt">Pasūtījums</b><span>${ds}</span></div>`;
+  [order.addr,order.name,order.note].forEach(v=>{if(v)h+=`<div>${esc(v)}</div>`});
+  put([h+'<hr style="border:0;border-top:.4pt solid #888;margin:2mm 0">']);
+  if(!order.blocks.length)put(['<p style="color:#777">Заказ пуст</p>']);
+  order.blocks.forEach(b=>{
+    const Ls=b.lists.filter(L=>frows(L).length);if(!Ls.length)return;
+    const all=m=>Ls.map((L,i)=>listHtml(b,L,m,frows(L),0,i===0?headOf(b,true):''));
+    if(put(all('s'))||put(all('d')))return;
+    const keep=pc;mk();
+    if(put(all('s'))||put(all('d')))return;
+    box.removeChild(box.lastChild);pc=keep;
+    Ls.forEach((L,i)=>placeLong(b,L,i===0));
+  });
+  const n=box.children.length;
+  if(n>1)[...box.children].forEach((pg,i)=>{const f=document.createElement('div');f.style.cssText='position:absolute;bottom:6mm;right:15mm;font-size:9pt;color:#555';f.textContent=(i+1)+' / '+n;pg.appendChild(f)});
+  box.style.zoom=Math.min(1.3,($('prev').clientWidth||336)/796);
+}
+function renderHub(){
+  $('oa').value=order.addr;$('on').value=order.name;$('oc').value=order.note;
+  $('blist').innerHTML=order.blocks.length?order.blocks.map((b,i)=>`<div class="row"><span>${i+1}. Подоконники${b.clr?', '+esc(b.clr):''}, строк: ${filled(b).length}</span><span><button data-ed="${i}">Изменить</button> <button data-rm="${i}">Удалить</button></span></div>`).join(''):'<div class="hint">Пока нет блоков</div>';
+  $('goSill').textContent='Подоконники'+(draftFilled()?' (не закончен)':'');
+}
+function renderPrev(){
+  $('fname').textContent='Файл: '+ds+' Metal Roofs.pdf';
+  renderSheet();
+}
+$('oa').oninput=e=>{order.addr=e.target.value};
+$('on').oninput=e=>{order.name=e.target.value};
+$('oc').oninput=e=>{order.note=e.target.value};
+$('blist').addEventListener('click',e=>{
+  const t=e.target,ed=t.dataset.ed,rm=t.dataset.rm;
+  if(ed!==undefined){editing=+ed;cur=cl(order.blocks[+ed]);load();show('sill')}
+  if(rm!==undefined)two(t,'Точно?',()=>{order.blocks.splice(+rm,1);renderHub()});
+});
+$('lists').addEventListener('input',e=>{const x=e.target.dataset;if(x.li===undefined)return;const L=cur.lists[+x.li];if(x.i!==undefined)L.rows[+x.i][x.k]=e.target.value;else if(x.k==='c')L.c=e.target.value});
+$('lists').addEventListener('click',e=>{
+  const t=e.target,x=t.dataset;
+  if(x.addrow!==undefined){cur.lists[+x.addrow].rows.push({a:'',b:'',l:'',q:''});lists()}
+  else if(x.del!==undefined){const L=cur.lists[+x.li];if(L.rows.length>1){L.rows.splice(+x.del,1);lists()}}
+  else if(x.dl!==undefined)two(t,'Точно?',()=>{cur.lists.splice(+x.dl,1);lists()});
+});
+$('addList').onclick=()=>{cur.lists.push(nl());lists()};
+$('clr').addEventListener('input',e=>{const t=e.target,s=t.selectionStart;t.value=t.value.toUpperCase();t.setSelectionRange(s,s);cur.clr=t.value});
+$('ua').onchange=e=>{cur.ua=e.target.value;heads()};
+$('ul').onchange=e=>{cur.ul=e.target.value;heads()};
+$('sk').addEventListener('click',e=>{const el=e.target.closest('[data-k]');if(!el)return;
+  sel=el.dataset.k;mark(sel);$('edl').textContent='Размер '+sel+':';$('edi').value=cur.p[sel];$('ed').hidden=false;$('edi').focus();$('edi').select()});
+$('edi').addEventListener('input',e=>{if(sel){cur.p[sel]=e.target.value;$('t'+sel).textContent=e.target.value||'—'}});
+$('edok').onclick=()=>{$('ed').hidden=true;sel=null;mark(null)};
+$('add').onclick=()=>{
+  if(!filled(cur).length){toast('Заполни хотя бы одну строку');return}
+  order.blocks.push(cl(cur));draft=nd();cur=draft;load();show('hub');toast('Блок добавлен в заказ');
+};
+$('save').onclick=()=>{order.blocks[editing]=cl(cur);editing=null;cur=draft;load();show('hub');toast('Изменения сохранены')};
+$('cancel').onclick=()=>{editing=null;cur=draft;load();show('hub')};
+$('bk2').onclick=()=>{if(editing!==null){editing=null;cur=draft}load();show('hub')};
+$('bk1').onclick=()=>show('home');$('bk3').onclick=()=>show(from);
+$('goSill').onclick=()=>{editing=null;cur=draft;load();show('sill')};
+$('cont').onclick=()=>show('hub');
+$('viewO1').onclick=()=>{from='home';show('prev')};$('viewO2').onclick=()=>{from='hub';show('prev')};
+$('newO').onclick=e=>{const go=()=>{order={active:true,date:ds,addr:'',name:'',note:'',blocks:[]};draft=nd();cur=draft;editing=null;load();show('tpl')};
+  const used=order.active&&(order.blocks.length||order.addr||order.name||order.note||draftFilled());
+  used?two(e.target,'Очистить текущий заказ?',go):go()};
+$('pdf').onclick=()=>toast('Сохранение из раздела пока не готово');
+$('pdf2').onclick=async()=>{
+  const btn=$('pdf2');
+  if(!window.html2canvas||!window.jspdf){toast('Не загрузилась библиотека PDF');return}
+  let dl=null;try{dl=await window.claude.use('downloads')}catch(e){}
+  btn.disabled=true;btn.textContent='Готовлю PDF…';
+  try{
+    renderSheet();const box=$('sheet');box.style.zoom=1;
+    const doc=new window.jspdf.jsPDF({unit:'mm',format:'a4',compress:true});
+    const pgs=[...box.querySelectorAll('.pg')];
+    for(let i=0;i<pgs.length;i++){
+      const cv=await html2canvas(pgs[i],{scale:2,backgroundColor:'#ffffff',logging:false,onclone:d=>{d.querySelectorAll('.pg').forEach(e=>e.style.border='0')}});
+      if(i)doc.addPage();
+      doc.addImage(cv.toDataURL('image/jpeg',0.92),'JPEG',0,0,210,297);
+    }
+    const blob=doc.output('blob'),name=ds+' Metal Roofs.pdf';
+    if(dl){await dl.save({filename:name,data:blob});toast('PDF сохранён')}
+    else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();toast('PDF сохранён')}
+  }catch(e){toast(e&&e.code==='declined'?'Сохранение отменено':'Не удалось сохранить PDF');console.error(e)}
+  finally{btn.disabled=false;btn.textContent='Сохранить PDF';renderSheet()}
+};
+$('tplSill').onclick=()=>{editing=null;cur=draft;load();show('sill')};
+$('bkT').onclick=()=>show('home');
+$('delO').onclick=e=>two(e.target,'Точно удалить заказ?',()=>{order={active:false,addr:'',name:'',note:'',blocks:[]};draft=nd();cur=draft;editing=null;load();show('home')});
+restore();load();show(scr==='tpl'&&!order.active?'home':scr);
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+</script></body></html>
