@@ -177,7 +177,8 @@ const rowsOf=b=>b.lists.flatMap(l=>l.rows);
 const filled=b=>rowsOf(b).filter(r=>r.a||r.l);
 const draftFilled=()=>draft.clr||draft.lists.some(l=>l.c||l.rows.some(r=>r.a||r.b||r.l||r.q));
 let from='home';
-const updHome=()=>{const a=order.active;$('cont').disabled=!a;$('viewO1').disabled=!a;$('cont').classList.toggle('pri',a);$('stat').textContent=a?'В работе: заказ от '+(order.date||ds)+', блоков: '+order.blocks.length:'Заказа в работе нет'};
+const inWork=()=>!!(order.blocks.length||order.addr||order.name||order.note||draftFilled());
+const updHome=()=>{const a=inWork();$('cont').disabled=!a;$('viewO1').disabled=!a;$('cont').classList.toggle('pri',a);$('stat').textContent=a?'В работе: заказ от '+(order.date||ds)+', блоков: '+order.blocks.length:'Заказа в работе нет'};
 function showRaw(id){if(scr==='sill'&&id!=='sill'&&editing!==null){editing=null;cur=draft;load()}scr=id;['home','tpl','hub','sill','prev'].forEach(s=>$(s).hidden=s!==id);if(id==='prev')renderPrev();if(id==='hub')renderHub();if(id==='home')updHome();window.scrollTo(0,0);save()}
 function show(id){showRaw(id);const h=id==='home'?'':id;if(location.hash.slice(1)!==h)location.hash=h}
 addEventListener('hashchange',()=>{const id=location.hash.slice(1)||'home';if(['home','tpl','hub','sill','prev'].includes(id)&&id!==scr)showRaw(id)});
@@ -303,7 +304,7 @@ $('goSill').onclick=()=>{editing=null;cur=draft;load();show('sill')};
 $('cont').onclick=()=>show('hub');
 $('viewO1').onclick=()=>{from='home';show('prev')};$('viewO2').onclick=()=>{from='hub';show('prev')};
 $('newO').onclick=e=>{const go=()=>{order={active:true,date:ds,addr:'',name:'',note:'',blocks:[]};draft=nd();cur=draft;editing=null;load();show('tpl')};
-  const used=order.active&&(order.blocks.length||order.addr||order.name||order.note||draftFilled());
+  const used=inWork();
   used?two(e.target,'Очистить текущий заказ?',go):go()};
 $('pdf').onclick=()=>toast('Сохранение из раздела пока не готово');
 $('pdf2').onclick=async()=>{
