@@ -49,6 +49,9 @@ button:disabled{opacity:.4}
 .cm{margin:2mm 0 1mm}.bt{margin-top:3mm;font-size:11pt}
 @page{size:A4;margin:0}
 @media print{body{background:#fff;padding:0;max-width:none}body>div:not(#prev){display:none!important}#prev>*:not(#sheet){display:none!important}#sheet{zoom:1!important}.pg{margin:0;border:0;break-after:page;page-break-after:always}.pg:last-child{break-after:auto;page-break-after:auto}}
+#home{display:flex;flex-direction:column;min-height:calc(100dvh - 24px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}
+.htop{display:flex;justify-content:space-between;align-items:center;gap:8px}.htop h1{margin:6px 0}
+.hbot{margin-top:auto}
 .row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--bd)}
 .row button{padding:6px 10px;font-size:14px}
 .big{display:block;width:100%;padding:14px;font-size:17px;margin-bottom:10px}
@@ -60,12 +63,31 @@ button:disabled{opacity:.4}
 </head><body>
 
 <div id="home">
-<h1>TinsmithAssist</h1>
+<div class="htop"><h1>TinsmithAssist</h1><button id="goSet">Настройки</button></div>
+<div class="hbot">
+<div class="hint" id="stat" style="font-size:14px;margin:4px 0 10px"></div>
 <button class="big pri" id="newO">Новый заказ</button>
 <button class="big" id="cont">Продолжить</button>
 <button class="big" id="viewO1">Посмотреть текущий</button>
-<div class="hint" id="stat" style="font-size:14px;margin:4px 0 10px"></div>
 <div class="hint">Недописанный заказ запоминается на телефоне.</div>
+</div>
+</div>
+
+<div id="set" hidden>
+<button class="back" id="bkS">← Меню</button>
+<h1>Настройки</h1>
+<div class="card"><h2>Язык</h2>
+<select id="lg"><option value="ru">Русский</option><option value="lv">Latviešu</option><option value="en">English</option></select></div>
+<div class="card"><h2>Язык PDF</h2>
+<select id="pl"><option value="lv">Latviešu</option><option value="ru">Русский</option><option value="en">English</option></select></div>
+<div class="card"><h2>Название фирмы</h2>
+<input id="co" type="text" style="text-align:left">
+<div class="hint">Подставляется в название файла после даты.</div></div>
+<div class="card"><h2>Папка для PDF</h2>
+<div id="dirname" style="font-size:14px;margin-bottom:8px"></div>
+<button class="big" id="pickDir">Выбрать папку</button>
+<button class="big" id="clrDir">Сбросить</button>
+<div class="hint" id="dirhint"></div></div>
 </div>
 
 <div id="tpl" hidden>
@@ -137,8 +159,8 @@ button:disabled{opacity:.4}
 <div class="card">
 <h2>Размеры</h2>
 <div class="g3" style="margin-bottom:8px">
-<label>a, b<select id="ua"><option>мм</option><option>см</option><option>м</option></select></label>
-<label>l<select id="ul"><option>м</option><option>см</option><option>мм</option></select></label><span></span></div>
+<label>a, b<select id="ua"><option value="мм">мм</option><option value="см">см</option><option value="м">м</option></select></label>
+<label>l<select id="ul"><option value="м">м</option><option value="см">см</option><option value="мм">мм</option></select></label><span></span></div>
 <div id="lists"></div>
 <button class="add" id="addList">Добавить список</button>
 <div class="hint">b — только если подоконник клином (края разной ширины). шт — если не указано, 1.</div>
@@ -178,14 +200,14 @@ const filled=b=>rowsOf(b).filter(r=>r.a||r.l);
 const draftFilled=()=>draft.clr||draft.lists.some(l=>l.c||l.rows.some(r=>r.a||r.b||r.l||r.q));
 let from='home';
 const inWork=()=>!!(order.blocks.length||order.addr||order.name||order.note||draftFilled());
-const updHome=()=>{const a=inWork();$('cont').disabled=!a;$('viewO1').disabled=!a;$('cont').classList.toggle('pri',a);$('stat').textContent=a?'В работе: заказ от '+(order.date||ds)+', блоков: '+order.blocks.length:'Заказа в работе нет'};
-function showRaw(id){if(scr==='sill'&&id!=='sill'&&editing!==null){editing=null;cur=draft;load()}scr=id;['home','tpl','hub','sill','prev'].forEach(s=>$(s).hidden=s!==id);if(id==='prev')renderPrev();if(id==='hub')renderHub();if(id==='home')updHome();window.scrollTo(0,0);save()}
+const updHome=()=>{const a=inWork();$('cont').disabled=!a;$('viewO1').disabled=!a;$('cont').classList.toggle('pri',a);$('stat').textContent=a?T('В работе: заказ от {0}, блоков: {1}',order.date||ds,order.blocks.length):T('Заказа в работе нет')};
+function showRaw(id){if(scr==='sill'&&id!=='sill'&&editing!==null){editing=null;cur=draft;load()}scr=id;['home','set','tpl','hub','sill','prev'].forEach(s=>$(s).hidden=s!==id);if(id==='prev')renderPrev();if(id==='hub')renderHub();if(id==='set')renderSet();if(id==='home')updHome();window.scrollTo(0,0);save()}
 function show(id){showRaw(id);const h=id==='home'?'':id;if(location.hash.slice(1)!==h)location.hash=h}
-addEventListener('hashchange',()=>{const id=location.hash.slice(1)||'home';if(['home','tpl','hub','sill','prev'].includes(id)&&id!==scr)showRaw(id)});
+addEventListener('hashchange',()=>{const id=location.hash.slice(1)||'home';if(['home','set','tpl','hub','sill','prev'].includes(id)&&id!==scr)showRaw(id)});
 function toast(t){const e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2200)}
 function two(b,label,fn){if(b.dataset.armed){clearTimeout(b._t);b.textContent=b.dataset.orig;delete b.dataset.armed;fn();return}b.dataset.orig=b.textContent;b.dataset.armed=1;b.textContent=label;b._t=setTimeout(()=>{b.textContent=b.dataset.orig;delete b.dataset.armed},3000)}
 function mark(k){['30','25','10'].forEach(n=>$('s'+n).setAttribute('stroke',n===k?'var(--ac)':'var(--fg)'))}
-function heads(){document.querySelectorAll('.ha').forEach(e=>e.textContent='a ('+cur.ua+')');document.querySelectorAll('.hb').forEach(e=>e.textContent='b ('+cur.ua+')');document.querySelectorAll('.hl').forEach(e=>e.textContent='l ('+cur.ul+')')}
+function heads(){document.querySelectorAll('.ha').forEach(e=>e.textContent='a ('+du(cur.ua)+')');document.querySelectorAll('.hb').forEach(e=>e.textContent='b ('+du(cur.ua)+')');document.querySelectorAll('.hl').forEach(e=>e.textContent='l ('+du(cur.ul)+')')}
 function lists(){
   $('lists').innerHTML=cur.lists.map((L,li)=>`<div style="margin-bottom:16px">
 <div style="display:flex;gap:6px;margin-bottom:6px"><input data-li="${li}" data-k="c" value="${esc(L.c)}" placeholder="Комментарий к списку" style="text-align:left">${cur.lists.length>1?`<button class="x" data-dl="${li}">✕</button>`:''}</div>
@@ -213,20 +235,21 @@ function sketch(p){
   return `<svg viewBox="30 134 195 94" style="width:87mm;display:block;margin:1mm 0 2mm"><polygon points="${pl(['A','B','B2','A2'])}" fill="#f6ece7"/><polygon points="${pl(['B','C','C2','B2'])}" fill="#efd6ca"/><polygon points="${pl(['A','T','T2','A2'])}" fill="#faf3ef"/><g stroke="#73726c" stroke-width=".8" fill="none"><polyline points="${pl(['T2','A2','B2','C2'])}"/><polyline points="${pl(['T','T2'])}"/><polyline points="${pl(['A','A2'])}"/><polyline points="${pl(['B','B2'])}"/><polyline points="${pl(['C','C2'])}"/></g><g stroke="#73726c" stroke-width=".8" stroke-dasharray="3 2"><polyline points="${pl(['E','E2'])}"/><polyline points="${pl(['C2','E2'])}"/></g><polyline points="${pl(['T','A','B','C','E'])}" fill="none" stroke="#1a1a18" stroke-width="1.8" stroke-linejoin="round"/><g font-size="10" fill="#111" font-family="sans-serif"><text x="46" y="176" text-anchor="end">${esc(p[30])}</text><text x="110" y="203" text-anchor="middle">a</text><text x="164" y="156" text-anchor="middle">b</text><text x="211" y="177">l</text><text x="157" y="222" text-anchor="end">${esc(p[10])}</text><text x="173" y="222">${esc(p[25])}</text></g></svg>`;
 }
 function renderSheet(){
+  const PL=cfg.pdfLang||'lv';const S={lv:{t:'Pasūtījums',w:'Palodzes',c:', krāsa ',nr:'Nr.',pc:'gab.',e:'Pasūtījums ir tukšs'},ru:{t:'Заказ',w:'Подоконники',c:', цвет ',nr:'№',pc:'шт',e:'Заказ пуст'},en:{t:'Order',w:'Window sills',c:', colour ',nr:'No.',pc:'pcs',e:'The order is empty'}}[PL];const U=u=>PL==='ru'?u:un(u);
   const box=$('sheet');box.innerHTML='';box.style.zoom=1;
   let pc;
   const mk=()=>{const pg=document.createElement('div');pg.className='pg';pc=document.createElement('div');pc.className='pc';pg.appendChild(pc);box.appendChild(pg)};
   const over=()=>pc.scrollHeight>pc.clientHeight+1;
   const put=hs=>{const els=hs.map(h=>{const e=document.createElement('div');e.innerHTML=h;pc.appendChild(e);return e});if(over()){els.forEach(e=>pc.removeChild(e));return false}return true};
   const frows=L=>L.rows.filter(r=>r.a||r.l);
-  const tbl=(b,rs,off)=>`<table><tr><th>Nr.</th><th>a (${un(b.ua)})</th><th>b (${un(b.ua)})</th><th>l (${un(b.ul)})</th><th>gab.</th></tr>`+rs.map((r,i)=>(r.b?`<tr><td>${off+i+1}</td><td>${esc(r.a)}</td><td>${esc(r.b)}</td>`:`<tr><td>${off+i+1}</td><td colspan="2">${esc(r.a)}</td>`)+`<td>${esc(r.l)}</td><td>${esc(r.q||1)}</td></tr>`).join('')+'</table>';
+  const tbl=(b,rs,off)=>`<table><tr><th>${S.nr}</th><th>a (${U(b.ua)})</th><th>b (${U(b.ua)})</th><th>l (${U(b.ul)})</th><th>${S.pc}</th></tr>`+rs.map((r,i)=>(r.b?`<tr><td>${off+i+1}</td><td>${esc(r.a)}</td><td>${esc(r.b)}</td>`:`<tr><td>${off+i+1}</td><td colspan="2">${esc(r.a)}</td>`)+`<td>${esc(r.l)}</td><td>${esc(r.q||1)}</td></tr>`).join('')+'</table>';
   const listHtml=(b,L,mode,rs,off,head)=>{
     const c=L.c?`<div class="cm"><i>${esc(L.c)}</i></div>`:'';
     if(mode==='s'||rs.length<2)return head+c+tbl(b,rs,off);
     const h=Math.ceil(rs.length/2);
     return head+c+`<div style="display:flex;gap:4mm"><div style="flex:1">${tbl(b,rs.slice(0,h),off)}</div><div style="flex:1">${tbl(b,rs.slice(h),off+h)}</div></div>`;
   };
-  const headOf=(b,sk)=>`<div class="bt"><b>Palodzes${b.clr?', krāsa '+esc(b.clr):''}</b></div>`+(sk?sketch(b.p):'');
+  const headOf=(b,sk)=>`<div class="bt"><b>${S.w}${b.clr?S.c+esc(b.clr):''}</b></div>`+(sk?sketch(b.p):'');
   const chunk=(b,L,rs,off,hd)=>{
     for(let t=0;t<2;t++){
       for(let n=rs.length-off;n>=1;n--)if(put([listHtml(b,L,'d',rs.slice(off,off+n),off,hd)]))return n;
@@ -243,10 +266,10 @@ function renderSheet(){
     while(off<rs.length){off+=chunk(b,L,rs,off,headOf(b,f));f=false;if(off<rs.length)mk()}
   };
   mk();
-  let h=`<div style="display:flex;justify-content:space-between"><b style="font-size:14pt">Pasūtījums</b><span>${ds}</span></div>`;
+  let h=`<div style="display:flex;justify-content:space-between"><b style="font-size:14pt">${S.t}</b><span>${ds}</span></div>`;
   [order.addr,order.name,order.note].forEach(v=>{if(v)h+=`<div>${esc(v)}</div>`});
   put([h+'<hr style="border:0;border-top:.4pt solid #888;margin:2mm 0">']);
-  if(!order.blocks.length)put(['<p style="color:#777">Заказ пуст</p>']);
+  if(!order.blocks.length)put(['<p style="color:#777">'+S.e+'</p>']);
   order.blocks.forEach(b=>{
     const Ls=b.lists.filter(L=>frows(L).length);if(!Ls.length)return;
     const all=m=>Ls.map((L,i)=>listHtml(b,L,m,frows(L),0,i===0?headOf(b,true):''));
@@ -262,11 +285,11 @@ function renderSheet(){
 }
 function renderHub(){
   $('oa').value=order.addr;$('on').value=order.name;$('oc').value=order.note;
-  $('blist').innerHTML=order.blocks.length?order.blocks.map((b,i)=>`<div class="row"><span>${i+1}. Подоконники${b.clr?', '+esc(b.clr):''}, строк: ${filled(b).length}</span><span><button data-ed="${i}">Изменить</button> <button data-rm="${i}">Удалить</button></span></div>`).join(''):'<div class="hint">Пока нет блоков</div>';
-  $('goSill').textContent='Подоконники'+(draftFilled()?' (не закончен)':'');
+  $('blist').innerHTML=order.blocks.length?order.blocks.map((b,i)=>`<div class="row"><span>${i+1}. ${T('Подоконники')}${b.clr?', '+esc(b.clr):''}, ${T('строк')}: ${filled(b).length}</span><span><button data-ed="${i}">Изменить</button> <button data-rm="${i}">Удалить</button></span></div>`).join(''):'<div class="hint">Пока нет блоков</div>';
+  $('goSill').textContent=T('Подоконники')+(draftFilled()?' '+T('(не закончен)'):'');
 }
 function renderPrev(){
-  $('fname').textContent='Файл: '+ds+' Metal Roofs.pdf';
+  $('fname').textContent=T('Файл: {0}',fname());
   renderSheet();
 }
 $('oa').oninput=e=>{order.addr=e.target.value};
@@ -289,7 +312,7 @@ $('clr').addEventListener('input',e=>{const t=e.target,s=t.selectionStart;t.valu
 $('ua').onchange=e=>{cur.ua=e.target.value;heads()};
 $('ul').onchange=e=>{cur.ul=e.target.value;heads()};
 $('sk').addEventListener('click',e=>{const el=e.target.closest('[data-k]');if(!el)return;
-  sel=el.dataset.k;mark(sel);$('edl').textContent='Размер '+sel+':';$('edi').value=cur.p[sel];$('ed').hidden=false;$('edi').focus();$('edi').select()});
+  sel=el.dataset.k;mark(sel);$('edl').textContent=T('Размер {0}:',sel);$('edi').value=cur.p[sel];$('ed').hidden=false;$('edi').focus();$('edi').select()});
 $('edi').addEventListener('input',e=>{if(sel){cur.p[sel]=e.target.value;$('t'+sel).textContent=e.target.value||'—'}});
 $('edok').onclick=()=>{$('ed').hidden=true;sel=null;mark(null)};
 $('add').onclick=()=>{
@@ -311,6 +334,8 @@ $('pdf2').onclick=async()=>{
   const btn=$('pdf2');
   if(!window.html2canvas||!window.jspdf){toast('Не загрузилась библиотека PDF');return}
   let dl=null;try{dl=await window.claude.use('downloads')}catch(e){}
+  let dirH=null;
+  try{dirH=await kvGet('dir');if(dirH){const o={mode:'readwrite'};if(await dirH.queryPermission(o)!=='granted'&&await dirH.requestPermission(o)!=='granted')dirH=null}}catch(e){dirH=null}
   btn.disabled=true;btn.textContent='Готовлю PDF…';
   try{
     renderSheet();const box=$('sheet');box.style.zoom=1;
@@ -321,16 +346,55 @@ $('pdf2').onclick=async()=>{
       if(i)doc.addPage();
       doc.addImage(cv.toDataURL('image/jpeg',0.92),'JPEG',0,0,210,297);
     }
-    const blob=doc.output('blob'),name=ds+' Metal Roofs.pdf';
+    const blob=doc.output('blob'),name=fname();
     if(dl){await dl.save({filename:name,data:blob});toast('PDF сохранён')}
-    else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();toast('PDF сохранён')}
+    else{const r=await savePdf(blob,name,dirH);toast(r==='folder'?'PDF сохранён в выбранную папку':'PDF сохранён')}
   }catch(e){toast(e&&e.code==='declined'?'Сохранение отменено':'Не удалось сохранить PDF');console.error(e)}
   finally{btn.disabled=false;btn.textContent='Сохранить PDF';renderSheet()}
 };
 $('tplSill').onclick=()=>{editing=null;cur=draft;load();show('sill')};
 $('bkT').onclick=()=>show('home');
 $('delO').onclick=e=>two(e.target,'Точно удалить заказ?',()=>{order={active:false,addr:'',name:'',note:'',blocks:[]};draft=nd();cur=draft;editing=null;load();show('home')});
-restore();load();show(scr==='tpl'&&!order.active?'home':scr);
+let cfg={co:''};
+try{const c=JSON.parse(localStorage.getItem('zamery-cfg')||'null');if(c)cfg=Object.assign(cfg,c)}catch(e){}
+const saveCfg=()=>{try{localStorage.setItem('zamery-cfg',JSON.stringify(cfg))}catch(e){}};
+const D={"Настройки": ["Iestatījumi", "Settings"], "Новый заказ": ["Jauns pasūtījums", "New order"], "Продолжить": ["Turpināt", "Continue"], "Посмотреть текущий": ["Skatīt pašreizējo", "View current"], "Недописанный заказ запоминается на телефоне.": ["Nepabeigtais pasūtījums tiek saglabāts tālrunī.", "An unfinished order is kept on the phone."], "← Меню": ["← Izvēlne", "← Menu"], "← Назад": ["← Atpakaļ", "← Back"], "Название фирмы": ["Uzņēmuma nosaukums", "Company name"], "Подставляется в название файла после даты.": ["Tiek pievienots faila nosaukumam aiz datuma.", "Added to the file name after the date."], "Папка для PDF": ["PDF mape", "PDF folder"], "Выбрать папку": ["Izvēlēties mapi", "Choose folder"], "Сбросить": ["Atiestatīt", "Reset"], "Язык": ["Valoda", "Language"], "Язык PDF": ["PDF valoda", "PDF language"], "Выбери шаблон": ["Izvēlies veidni", "Choose a template"], "Подоконники": ["Palodzes", "Window sills"], "Произвольные детали": ["Brīvas detaļas", "Custom parts"], "Другие шаблоны появятся здесь.": ["Citas veidnes parādīsies šeit.", "Other templates will appear here."], "Заказ": ["Pasūtījums", "Order"], "Данные заказа": ["Pasūtījuma dati", "Order details"], "Адрес": ["Adrese", "Address"], "Имя": ["Vārds", "Name"], "Примечание": ["Piezīme", "Note"], "Блоки": ["Bloki", "Blocks"], "Добавить блок": ["Pievienot bloku", "Add block"], "Удалить заказ": ["Dzēst pasūtījumu", "Delete order"], "Цвет": ["Krāsa", "Colour"], "Нажми на размер или отрезок, чтобы изменить (мм)": ["Pieskaries izmēram vai malai, lai mainītu (mm)", "Tap a size or an edge to change it (mm)"], "Готово": ["Gatavs", "Done"], "Размеры": ["Izmēri", "Sizes"], "Добавить список": ["Pievienot sarakstu", "Add list"], "b — только если подоконник клином (края разной ширины). шт — если не указано, 1.": ["b — tikai ja palodze ir ķīļveida (malas dažāda platuma). gab. — ja nav norādīts, 1.", "b — only if the sill is tapered (edges of different width). pcs — 1 if not given."], "Добавить в заказ": ["Pievienot pasūtījumam", "Add to order"], "Сохранить PDF": ["Saglabāt PDF", "Save PDF"], "Сохранить изменения": ["Saglabāt izmaiņas", "Save changes"], "Отмена": ["Atcelt", "Cancel"], "Текущий заказ": ["Pašreizējais pasūtījums", "Current order"], "Подоконники: правка": ["Palodzes: labošana", "Window sills: editing"], "шт": ["gab.", "pcs"], "Добавить позицию": ["Pievienot pozīciju", "Add item"], "Изменить": ["Mainīt", "Edit"], "Удалить": ["Dzēst", "Delete"], "Пока нет блоков": ["Pagaidām nav bloku", "No blocks yet"], "Заказ пуст": ["Pasūtījums ir tukšs", "The order is empty"], "Комментарий к списку": ["Saraksta komentārs", "List comment"], "(не закончен)": ["(nepabeigts)", "(unfinished)"], "строк": ["rindas", "rows"], "Заполни хотя бы одну строку": ["Aizpildi vismaz vienu rindu", "Fill in at least one row"], "Блок добавлен в заказ": ["Bloks pievienots pasūtījumam", "Block added to the order"], "Изменения сохранены": ["Izmaiņas saglabātas", "Changes saved"], "Точно?": ["Tiešām?", "Sure?"], "Очистить текущий заказ?": ["Notīrīt pašreizējo pasūtījumu?", "Clear the current order?"], "Точно удалить заказ?": ["Tiešām dzēst pasūtījumu?", "Really delete the order?"], "Сохранение из раздела пока не готово": ["Saglabāšana no sadaļas vēl nav gatava", "Saving from a section is not ready yet"], "Не загрузилась библиотека PDF": ["PDF bibliotēka neielādējās", "The PDF library did not load"], "Готовлю PDF…": ["Gatavoju PDF…", "Preparing PDF…"], "PDF сохранён": ["PDF saglabāts", "PDF saved"], "PDF сохранён в выбранную папку": ["PDF saglabāts izvēlētajā mapē", "PDF saved to the chosen folder"], "Сохранение отменено": ["Saglabāšana atcelta", "Saving cancelled"], "Не удалось сохранить PDF": ["Neizdevās saglabāt PDF", "Could not save the PDF"], "Папка недоступна, сохраняю в загрузки": ["Mape nav pieejama, saglabāju lejupielādēs", "Folder unavailable, saving to downloads"], "Выбор папки здесь не поддерживается": ["Mapes izvēle šeit netiek atbalstīta", "Choosing a folder is not supported here"], "Папка выбрана": ["Mape izvēlēta", "Folder chosen"], "Не получилось выбрать папку": ["Neizdevās izvēlēties mapi", "Could not choose the folder"], "Не выбрана: файлы идут в загрузки": ["Nav izvēlēta: faili tiek saglabāti lejupielādēs", "Not chosen: files go to downloads"], "Выбери папку, которую создал заранее. Корневые папки (Загрузки, Документы) браузер может не разрешить.": ["Izvēlies iepriekš izveidotu mapi. Pārlūks var neatļaut saknes mapes (Lejupielādes, Dokumenti).", "Choose a folder you created in advance. The browser may not allow top-level folders (Downloads, Documents)."], "Этот браузер не умеет выбирать папку: файлы идут в загрузки.": ["Šis pārlūks nevar izvēlēties mapi: faili tiek saglabāti lejupielādēs.", "This browser cannot choose a folder: files go to downloads."], "мм": ["mm", "mm"], "см": ["cm", "cm"], "м": ["m", "m"], "Размер {0}:": ["Izmērs {0}:", "Size {0}:"], "В работе: заказ от {0}, блоков: {1}": ["Darbā: pasūtījums no {0}, bloki: {1}", "In progress: order from {0}, blocks: {1}"], "Заказа в работе нет": ["Nav pasūtījuma darbā", "No order in progress"], "Папка: {0}": ["Mape: {0}", "Folder: {0}"], "Файл: {0}": ["Fails: {0}", "File: {0}"]};
+let lang=cfg.lang||((navigator.language||'ru').slice(0,2));if(!['ru','lv','en'].includes(lang))lang='en';
+const T=(ru,...a)=>{const d=D[ru];let t=(lang==='ru'||!d)?ru:d[lang==='lv'?0:1];a.forEach((v,i)=>{t=t.replace('{'+i+'}',v)});return t};
+const du=u=>lang==='ru'?u:un(u);
+function trNode(n){const p=n.parentNode;if(!p||p.nodeName==='SCRIPT'||p.nodeName==='STYLE'||(p.closest&&p.closest('#sheet')))return;const t=n.nodeValue;if(!t||!t.trim())return;let ru=n._ru;if(ru===undefined){ru=t.trim();if(!D[ru])return;n._ru=ru}
+  const v=t.match(/^\s*/)[0]+T(ru)+t.match(/\s*$/)[0];if(v!==t)n.nodeValue=v}
+function trEl(e){let ru=e._ph;if(ru===undefined){ru=e.getAttribute('placeholder');if(!D[ru])return;e._ph=ru}e.setAttribute('placeholder',T(ru))}
+function applyLang(root){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))trNode(n);
+  if(root.matches&&root.matches('[placeholder]'))trEl(root);root.querySelectorAll('[placeholder]').forEach(trEl)}
+new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(x=>{if(x.nodeType===3)trNode(x);else if(x.nodeType===1)applyLang(x)}))).observe(document.body,{childList:true,subtree:true});
+$('lg').onchange=e=>{cfg.lang=e.target.value;lang=cfg.lang;saveCfg();document.documentElement.lang=lang;applyLang(document.body);load();showRaw(scr)};
+
+const fname=()=>{const c=(cfg.co||'').replace(/[\\/:*?"<>|]/g,'').trim();return ds+(c?' '+c:'')+'.pdf'};
+const idb=()=>new Promise((res,rej)=>{const r=indexedDB.open('zamery-db',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+const kvGet=async k=>{const d=await idb();return new Promise((res,rej)=>{const q=d.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})};
+const kvSet=async(k,v)=>{const d=await idb();return new Promise((res,rej)=>{const t=d.transaction('kv','readwrite');if(v===undefined)t.objectStore('kv').delete(k);else t.objectStore('kv').put(v,k);t.oncomplete=()=>res();t.onerror=()=>rej(t.error)})};
+async function showDir(){let h=null;try{h=await kvGet('dir')}catch(e){}$('dirname').textContent=h?T('Папка: {0}',h.name):T('Не выбрана: файлы идут в загрузки');
+  $('dirhint').textContent=window.showDirectoryPicker?'Выбери папку, которую создал заранее. Корневые папки (Загрузки, Документы) браузер может не разрешить.':'Этот браузер не умеет выбирать папку: файлы идут в загрузки.'}
+function renderSet(){$('co').value=cfg.co||'';$('lg').value=lang;$('pl').value=cfg.pdfLang||'lv';showDir()}
+$('pl').onchange=e=>{cfg.pdfLang=e.target.value;saveCfg()};
+$('co').addEventListener('input',e=>{cfg.co=e.target.value;saveCfg()});
+$('pickDir').onclick=async()=>{
+  if(!window.showDirectoryPicker){toast('Выбор папки здесь не поддерживается');return}
+  let h;
+  try{h=await showDirectoryPicker({id:'orders',mode:'readwrite'})}
+  catch(e){if(!e||e.name!=='AbortError'){toast('Не получилось выбрать папку');$('dirhint').textContent='picker: '+(e&&e.name)+': '+(e&&e.message)}return}
+  try{await kvSet('dir',h);showDir();toast('Папка выбрана')}
+  catch(e){toast('Не получилось выбрать папку');$('dirhint').textContent='storage: '+(e&&e.name)+': '+(e&&e.message)}
+};
+$('clrDir').onclick=async()=>{try{await kvSet('dir',undefined)}catch(e){}showDir()};
+$('goSet').onclick=()=>show('set');$('bkS').onclick=()=>show('home');
+async function uniq(h,name){const base=name.replace(/\.pdf$/,'');let n=name,i=1;for(;;){try{await h.getFileHandle(n);i++;n=base+' ('+i+').pdf'}catch(e){return n}}}
+async function savePdf(blob,name,h){
+  if(h){try{const fh=await h.getFileHandle(await uniq(h,name),{create:true});const w=await fh.createWritable();await w.write(blob);await w.close();return 'folder'}catch(e){toast('Папка недоступна, сохраняю в загрузки')}}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();return 'download';
+}
+restore();load();show(scr==='tpl'&&!order.active?'home':scr);document.documentElement.lang=lang;applyLang(document.body);
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
 </script></body></html>
