@@ -49,6 +49,12 @@ button:disabled{opacity:.4}
 .cm{margin:2mm 0 1mm}.bt{margin-top:3mm;font-size:11pt}
 @page{size:A4;margin:0}
 @media print{body{background:#fff;padding:0;max-width:none}body>div:not(#prev){display:none!important}#prev>*:not(#sheet){display:none!important}#sheet{zoom:1!important}.pg{margin:0;border:0;break-after:page;page-break-after:always}.pg:last-child{break-after:auto;page-break-after:auto}}
+#cpop{position:fixed;left:0;right:0;top:0;z-index:40;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 0}
+.pbox{background:var(--card);border:1px solid var(--bd);border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,.28);padding:12px;max-width:536px;margin:0 auto}
+.pbox .mb{display:block;width:100%;margin-bottom:6px;text-align:left}
+.pbox .f{margin-bottom:8px}.prow{display:flex;gap:8px;flex-wrap:wrap}
+.tools{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:6px}.tools button{padding:8px 12px;min-width:44px;display:inline-flex;align-items:center;justify-content:center}
+.tools svg{width:22px;height:22px;display:block}
 #home{display:flex;flex-direction:column;min-height:calc(100dvh - 24px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}
 .htop{display:flex;justify-content:space-between;align-items:center;gap:8px}.htop h1{margin:6px 0}
 .hbot{margin-top:auto}
@@ -95,7 +101,7 @@ button:disabled{opacity:.4}
 <h1>Новый заказ</h1>
 <h2>Выбери шаблон</h2>
 <button class="menu" id="tplSill">Подоконники</button>
-<button class="menu" disabled style="margin-top:8px">Произвольные детали</button>
+<button class="menu" id="tplCust" style="margin-top:8px">Произвольные детали</button>
 <div class="hint">Другие шаблоны появятся здесь.</div>
 </div>
 
@@ -108,7 +114,8 @@ button:disabled{opacity:.4}
 <label>Примечание<input id="oc" type="text"></label></div></div>
 <div class="card"><h2>Блоки</h2><div id="blist"></div>
 <h2 style="margin-top:14px">Добавить блок</h2>
-<button class="menu" id="goSill">Подоконники</button></div>
+<button class="menu" id="goSill">Подоконники</button>
+<button class="menu" id="goCust" style="margin-top:8px">Произвольные детали</button></div>
 <button class="big" id="viewO2">Посмотреть текущий</button>
 <button class="big" id="delO">Удалить заказ</button>
 </div>
@@ -178,6 +185,43 @@ button:disabled{opacity:.4}
 <button class="big pri" id="pdf2" style="margin-top:12px">Сохранить PDF</button>
 <div class="hint" id="fname"></div>
 </div>
+<div id="cust" hidden>
+<button class="back" id="bkC">← Назад</button>
+<h1>Произвольные детали</h1>
+<div class="card">
+<div class="clr"><label>Цвет<input id="cclr" type="text" autocapitalize="characters" style="text-transform:uppercase"></label></div>
+<svg id="csk" viewBox="0 0 340 190" style="margin-top:44px;touch-action:pan-x pan-y" role="img"><title>Деталь</title></svg>
+<div class="tools">
+<button id="undo" aria-label="undo">↶</button><button id="redo" aria-label="redo">↷</button><button id="rotL">↺</button><button id="rotR">↻</button><button id="mH" aria-label="flip horizontal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21" stroke-dasharray="2.5 2"/><path d="M10 6 L3 12 L10 18 Z"/><path d="M14 6 L21 12 L14 18 Z" fill="currentColor" fill-opacity=".35"/></svg></button><button id="mV" aria-label="flip vertical"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12" stroke-dasharray="2.5 2"/><path d="M6 10 L12 3 L18 10 Z"/><path d="M6 14 L12 21 L18 14 Z" fill="currentColor" fill-opacity=".35"/></svg></button>
+<button id="zOut">−</button><button id="zIn">+</button><button id="zFit">⤢</button>
+</div>
+<div class="hint">Нажми на отрезок или угол, чтобы изменить. Плюс на конце открывает меню.</div>
+</div>
+<div class="card"><h2>Размеры</h2>
+<div class="g3" style="margin-bottom:8px"><label>l<select id="cul"><option value="м">м</option><option value="см">см</option><option value="мм">мм</option></select></label><span></span><span></span></div>
+<div id="clists"></div>
+<button class="add" id="addCList">Добавить список</button></div>
+<button class="big pri" id="addC">Добавить в заказ</button>
+<button class="big pri" id="saveC" hidden>Сохранить изменения</button>
+<button class="big" id="cancelC" hidden>Отмена</button>
+</div>
+
+<div id="cpop" hidden><div class="pbox">
+<div id="pmenu" hidden>
+<button class="mb" id="mAdd">Добавить отрезок</button>
+<button class="mb" id="mSym">Скопировать всё зеркально</button>
+<button class="mb" id="mHem">Завершающий загиб</button>
+<button class="mb" id="mCancel">Отмена</button>
+</div>
+<div id="pedit" hidden>
+<div class="f">
+<label id="rA">Угол между отрезками, °<input id="iA" type="number" inputmode="decimal"><small style="display:block;margin-top:4px">0° — прижато до конца</small></label>
+<label id="rL">Длина отрезка, мм<input id="iL" type="number" inputmode="decimal"></label>
+<label id="rH">Длина загиба, мм<input id="iH" type="number" inputmode="decimal"></label>
+</div>
+<div class="prow"><button id="flipJ">Сторона</button><button id="delS">Удалить отрезок</button><button id="delH">Удалить загиб</button><button id="cedok">Готово</button></div>
+</div>
+</div></div>
 <div id="toast" hidden></div>
 
 <script>
@@ -185,13 +229,14 @@ const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const nl=()=>({c:'',rows:[{a:'',b:'',l:'',q:''}]});
 const nd=()=>({p:{30:30,25:25,10:10},clr:'',ua:'мм',ul:'м',lists:[nl()]});
+const nc=()=>({type:'cust',clr:'',ul:'м',part:{segs:[100],joints:[],rot:0,hemS:null,hemE:null},lists:[{c:'',rows:[{l:'',q:''}]}]});
 const cl=o=>JSON.parse(JSON.stringify(o));
 const mig=b=>{if(b&&b.rows&&!b.lists){b.lists=[{c:'',rows:b.rows}];delete b.rows}return b};
 const un=x=>({'мм':'mm','см':'cm','м':'m'}[x]||x);
-let order={active:false,addr:'',name:'',note:'',blocks:[]},draft=nd(),cur=draft,editing=null,sel=null,scr='home';
+let order={active:false,addr:'',name:'',note:'',blocks:[]},draft=nd(),cur=draft,editing=null,sel=null,scr='home',draftC=nc(),curC=draftC,selC=null,et='sill';
 const KEY='zamery-v1';
-function save(){try{localStorage.setItem(KEY,JSON.stringify({order,draft,editing,scr,cur:editing!==null?cur:null}))}catch(e){}}
-function restore(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(!s||!s.order)return;order=s.order;if(order.active===undefined)order.active=!!(order.blocks.length||order.addr||order.name||order.note);order.blocks=order.blocks.map(mig);draft=mig(s.draft);editing=s.editing;scr=s.scr==='sections'?'hub':(s.scr||'home');cur=(editing!==null&&s.cur)?mig(s.cur):draft}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({order,draft,draftC,editing,et,scr,cur:(editing!==null&&et==='sill')?cur:null,curC:(editing!==null&&et==='cust')?curC:null}))}catch(e){}}
+function restore(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(!s||!s.order)return;order=s.order;if(order.active===undefined)order.active=!!(order.blocks.length||order.addr||order.name||order.note);order.blocks=order.blocks.map(mig);draft=mig(s.draft);editing=s.editing;scr=s.scr==='sections'?'hub':(s.scr||'home');et=s.et||'sill';draftC=s.draftC||nc();cur=(editing!==null&&s.cur)?mig(s.cur):draft;curC=(editing!==null&&s.curC)?s.curC:draftC}catch(e){}}
 ['input','change','click'].forEach(t=>document.addEventListener(t,save));
 addEventListener('pagehide',save);document.addEventListener('visibilitychange',save);
 const d=new Date(),ds=String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();
@@ -199,11 +244,13 @@ const rowsOf=b=>b.lists.flatMap(l=>l.rows);
 const filled=b=>rowsOf(b).filter(r=>r.a||r.l);
 const draftFilled=()=>draft.clr||draft.lists.some(l=>l.c||l.rows.some(r=>r.a||r.b||r.l||r.q));
 let from='home';
-const inWork=()=>!!(order.blocks.length||order.addr||order.name||order.note||draftFilled());
+const inWork=()=>!!(order.blocks.length||order.addr||order.name||order.note||draftFilled()||draftCFilled());
 const updHome=()=>{const a=inWork();$('cont').disabled=!a;$('viewO1').disabled=!a;$('cont').classList.toggle('pri',a);$('stat').textContent=a?T('В работе: заказ от {0}, блоков: {1}',order.date||ds,order.blocks.length):T('Заказа в работе нет')};
-function showRaw(id){if(scr==='sill'&&id!=='sill'&&editing!==null){editing=null;cur=draft;load()}scr=id;['home','set','tpl','hub','sill','prev'].forEach(s=>$(s).hidden=s!==id);if(id==='prev')renderPrev();if(id==='hub')renderHub();if(id==='set')renderSet();if(id==='home')updHome();window.scrollTo(0,0);save()}
+function showRaw(id){if(scr==='sill'&&id!=='sill'&&editing!==null){editing=null;cur=draft;load()}
+  if(id!=='cust')$('cpop').hidden=true;
+  if(scr==='cust'&&id!=='cust'&&editing!==null){editing=null;curC=draftC;loadC()}scr=id;['home','set','tpl','hub','sill','cust','prev'].forEach(s=>$(s).hidden=s!==id);if(id==='prev')renderPrev();if(id==='hub')renderHub();if(id==='set')renderSet();if(id==='home')updHome();window.scrollTo(0,0);save()}
 function show(id){showRaw(id);const h=id==='home'?'':id;if(location.hash.slice(1)!==h)location.hash=h}
-addEventListener('hashchange',()=>{const id=location.hash.slice(1)||'home';if(['home','set','tpl','hub','sill','prev'].includes(id)&&id!==scr)showRaw(id)});
+addEventListener('hashchange',()=>{const id=location.hash.slice(1)||'home';if(['home','set','tpl','hub','sill','cust','prev'].includes(id)&&id!==scr)showRaw(id)});
 function toast(t){const e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2200)}
 function two(b,label,fn){if(b.dataset.armed){clearTimeout(b._t);b.textContent=b.dataset.orig;delete b.dataset.armed;fn();return}b.dataset.orig=b.textContent;b.dataset.armed=1;b.textContent=label;b._t=setTimeout(()=>{b.textContent=b.dataset.orig;delete b.dataset.armed},3000)}
 function mark(k){['30','25','10'].forEach(n=>$('s'+n).setAttribute('stroke',n===k?'var(--ac)':'var(--fg)'))}
@@ -235,21 +282,23 @@ function sketch(p){
   return `<svg viewBox="30 134 195 94" style="width:87mm;display:block;margin:1mm 0 2mm"><polygon points="${pl(['A','B','B2','A2'])}" fill="#f6ece7"/><polygon points="${pl(['B','C','C2','B2'])}" fill="#efd6ca"/><polygon points="${pl(['A','T','T2','A2'])}" fill="#faf3ef"/><g stroke="#73726c" stroke-width=".8" fill="none"><polyline points="${pl(['T2','A2','B2','C2'])}"/><polyline points="${pl(['T','T2'])}"/><polyline points="${pl(['A','A2'])}"/><polyline points="${pl(['B','B2'])}"/><polyline points="${pl(['C','C2'])}"/></g><g stroke="#73726c" stroke-width=".8" stroke-dasharray="3 2"><polyline points="${pl(['E','E2'])}"/><polyline points="${pl(['C2','E2'])}"/></g><polyline points="${pl(['T','A','B','C','E'])}" fill="none" stroke="#1a1a18" stroke-width="1.8" stroke-linejoin="round"/><g font-size="10" fill="#111" font-family="sans-serif"><text x="46" y="176" text-anchor="end">${esc(p[30])}</text><text x="110" y="203" text-anchor="middle">a</text><text x="164" y="156" text-anchor="middle">b</text><text x="211" y="177">l</text><text x="157" y="222" text-anchor="end">${esc(p[10])}</text><text x="173" y="222">${esc(p[25])}</text></g></svg>`;
 }
 function renderSheet(){
-  const PL=cfg.pdfLang||'lv';const S={lv:{t:'Pasūtījums',w:'Palodzes',c:', krāsa ',nr:'Nr.',pc:'gab.',e:'Pasūtījums ir tukšs'},ru:{t:'Заказ',w:'Подоконники',c:', цвет ',nr:'№',pc:'шт',e:'Заказ пуст'},en:{t:'Order',w:'Window sills',c:', colour ',nr:'No.',pc:'pcs',e:'The order is empty'}}[PL];const U=u=>PL==='ru'?u:un(u);
+  const PL=cfg.pdfLang||'lv';const S={lv:{t:'Pasūtījums',w:'Palodzes',cp:'Detaļa',c:', krāsa ',nr:'Nr.',pc:'gab.',e:'Pasūtījums ir tukšs'},ru:{t:'Заказ',w:'Подоконники',cp:'Деталь',c:', цвет ',nr:'№',pc:'шт',e:'Заказ пуст'},en:{t:'Order',w:'Window sills',cp:'Part',c:', colour ',nr:'No.',pc:'pcs',e:'The order is empty'}}[PL];const U=u=>PL==='ru'?u:un(u);
   const box=$('sheet');box.innerHTML='';box.style.zoom=1;
   let pc;
   const mk=()=>{const pg=document.createElement('div');pg.className='pg';pc=document.createElement('div');pc.className='pc';pg.appendChild(pc);box.appendChild(pg)};
   const over=()=>pc.scrollHeight>pc.clientHeight+1;
   const put=hs=>{const els=hs.map(h=>{const e=document.createElement('div');e.innerHTML=h;pc.appendChild(e);return e});if(over()){els.forEach(e=>pc.removeChild(e));return false}return true};
   const frows=L=>L.rows.filter(r=>r.a||r.l);
-  const tbl=(b,rs,off)=>`<table><tr><th>${S.nr}</th><th>a (${U(b.ua)})</th><th>b (${U(b.ua)})</th><th>l (${U(b.ul)})</th><th>${S.pc}</th></tr>`+rs.map((r,i)=>(r.b?`<tr><td>${off+i+1}</td><td>${esc(r.a)}</td><td>${esc(r.b)}</td>`:`<tr><td>${off+i+1}</td><td colspan="2">${esc(r.a)}</td>`)+`<td>${esc(r.l)}</td><td>${esc(r.q||1)}</td></tr>`).join('')+'</table>';
+  const tblC=(b,rs,off)=>`<table><tr><th>${S.nr}</th><th>l (${U(b.ul)})</th><th>${S.pc}</th></tr>`+rs.map((r,i)=>`<tr><td>${off+i+1}</td><td>${esc(r.l)}</td><td>${esc(r.q||1)}</td></tr>`).join('')+'</table>';
+  const tbl=(b,rs,off)=>b.type==='cust'?tblC(b,rs,off):tbl0(b,rs,off);
+  const tbl0=(b,rs,off)=>`<table><tr><th>${S.nr}</th><th>a (${U(b.ua)})</th><th>b (${U(b.ua)})</th><th>l (${U(b.ul)})</th><th>${S.pc}</th></tr>`+rs.map((r,i)=>(r.b?`<tr><td>${off+i+1}</td><td>${esc(r.a)}</td><td>${esc(r.b)}</td>`:`<tr><td>${off+i+1}</td><td colspan="2">${esc(r.a)}</td>`)+`<td>${esc(r.l)}</td><td>${esc(r.q||1)}</td></tr>`).join('')+'</table>';
   const listHtml=(b,L,mode,rs,off,head)=>{
     const c=L.c?`<div class="cm"><i>${esc(L.c)}</i></div>`:'';
     if(mode==='s'||rs.length<2)return head+c+tbl(b,rs,off);
     const h=Math.ceil(rs.length/2);
     return head+c+`<div style="display:flex;gap:4mm"><div style="flex:1">${tbl(b,rs.slice(0,h),off)}</div><div style="flex:1">${tbl(b,rs.slice(h),off+h)}</div></div>`;
   };
-  const headOf=(b,sk)=>`<div class="bt"><b>${S.w}${b.clr?S.c+esc(b.clr):''}</b></div>`+(sk?sketch(b.p):'');
+  const headOf=(b,sk)=>`<div class="bt"><b>${b.type==='cust'?S.cp:S.w}${b.clr?S.c+esc(b.clr):''}</b></div>`+(sk?(b.type==='cust'?chainSheet(b.part):sketch(b.p)):'');
   const chunk=(b,L,rs,off,hd)=>{
     for(let t=0;t<2;t++){
       for(let n=rs.length-off;n>=1;n--)if(put([listHtml(b,L,'d',rs.slice(off,off+n),off,hd)]))return n;
@@ -285,8 +334,9 @@ function renderSheet(){
 }
 function renderHub(){
   $('oa').value=order.addr;$('on').value=order.name;$('oc').value=order.note;
-  $('blist').innerHTML=order.blocks.length?order.blocks.map((b,i)=>`<div class="row"><span>${i+1}. ${T('Подоконники')}${b.clr?', '+esc(b.clr):''}, ${T('строк')}: ${filled(b).length}</span><span><button data-ed="${i}">Изменить</button> <button data-rm="${i}">Удалить</button></span></div>`).join(''):'<div class="hint">Пока нет блоков</div>';
+  $('blist').innerHTML=order.blocks.length?order.blocks.map((b,i)=>`<div class="row"><span>${i+1}. ${T(b.type==='cust'?'Произвольные детали':'Подоконники')}${b.clr?', '+esc(b.clr):''}, ${T('строк')}: ${filled(b).length}</span><span><button data-ed="${i}">Изменить</button> <button data-rm="${i}">Удалить</button></span></div>`).join(''):'<div class="hint">Пока нет блоков</div>';
   $('goSill').textContent=T('Подоконники')+(draftFilled()?' '+T('(не закончен)'):'');
+  $('goCust').textContent=T('Произвольные детали')+(draftCFilled()?' '+T('(не закончен)'):'');
 }
 function renderPrev(){
   $('fname').textContent=T('Файл: {0}',fname());
@@ -297,7 +347,7 @@ $('on').oninput=e=>{order.name=e.target.value};
 $('oc').oninput=e=>{order.note=e.target.value};
 $('blist').addEventListener('click',e=>{
   const t=e.target,ed=t.dataset.ed,rm=t.dataset.rm;
-  if(ed!==undefined){editing=+ed;cur=cl(order.blocks[+ed]);load();show('sill')}
+  if(ed!==undefined){editing=+ed;const bb=order.blocks[+ed];if(bb.type==='cust'){et='cust';curC=cl(bb);loadC();show('cust')}else{et='sill';cur=cl(bb);load();show('sill')}}
   if(rm!==undefined)two(t,'Точно?',()=>{order.blocks.splice(+rm,1);renderHub()});
 });
 $('lists').addEventListener('input',e=>{const x=e.target.dataset;if(x.li===undefined)return;const L=cur.lists[+x.li];if(x.i!==undefined)L.rows[+x.i][x.k]=e.target.value;else if(x.k==='c')L.c=e.target.value});
@@ -326,7 +376,7 @@ $('bk1').onclick=()=>show('home');$('bk3').onclick=()=>show(from);
 $('goSill').onclick=()=>{editing=null;cur=draft;load();show('sill')};
 $('cont').onclick=()=>show('hub');
 $('viewO1').onclick=()=>{from='home';show('prev')};$('viewO2').onclick=()=>{from='hub';show('prev')};
-$('newO').onclick=e=>{const go=()=>{order={active:true,date:ds,addr:'',name:'',note:'',blocks:[]};draft=nd();cur=draft;editing=null;load();show('tpl')};
+$('newO').onclick=e=>{const go=()=>{order={active:true,date:ds,addr:'',name:'',note:'',blocks:[]};draft=nd();cur=draft;draftC=nc();curC=draftC;editing=null;load();show('tpl')};
   const used=inWork();
   used?two(e.target,'Очистить текущий заказ?',go):go()};
 $('pdf').onclick=()=>toast('Сохранение из раздела пока не готово');
@@ -354,11 +404,11 @@ $('pdf2').onclick=async()=>{
 };
 $('tplSill').onclick=()=>{editing=null;cur=draft;load();show('sill')};
 $('bkT').onclick=()=>show('home');
-$('delO').onclick=e=>two(e.target,'Точно удалить заказ?',()=>{order={active:false,addr:'',name:'',note:'',blocks:[]};draft=nd();cur=draft;editing=null;load();show('home')});
+$('delO').onclick=e=>two(e.target,'Точно удалить заказ?',()=>{order={active:false,addr:'',name:'',note:'',blocks:[]};draft=nd();cur=draft;draftC=nc();curC=draftC;editing=null;load();show('home')});
 let cfg={co:''};
 try{const c=JSON.parse(localStorage.getItem('zamery-cfg')||'null');if(c)cfg=Object.assign(cfg,c)}catch(e){}
 const saveCfg=()=>{try{localStorage.setItem('zamery-cfg',JSON.stringify(cfg))}catch(e){}};
-const D={"Настройки": ["Iestatījumi", "Settings"], "Новый заказ": ["Jauns pasūtījums", "New order"], "Продолжить": ["Turpināt", "Continue"], "Посмотреть текущий": ["Skatīt pašreizējo", "View current"], "Недописанный заказ запоминается на телефоне.": ["Nepabeigtais pasūtījums tiek saglabāts tālrunī.", "An unfinished order is kept on the phone."], "← Меню": ["← Izvēlne", "← Menu"], "← Назад": ["← Atpakaļ", "← Back"], "Название фирмы": ["Uzņēmuma nosaukums", "Company name"], "Подставляется в название файла после даты.": ["Tiek pievienots faila nosaukumam aiz datuma.", "Added to the file name after the date."], "Папка для PDF": ["PDF mape", "PDF folder"], "Выбрать папку": ["Izvēlēties mapi", "Choose folder"], "Сбросить": ["Atiestatīt", "Reset"], "Язык": ["Valoda", "Language"], "Язык PDF": ["PDF valoda", "PDF language"], "Выбери шаблон": ["Izvēlies veidni", "Choose a template"], "Подоконники": ["Palodzes", "Window sills"], "Произвольные детали": ["Brīvas detaļas", "Custom parts"], "Другие шаблоны появятся здесь.": ["Citas veidnes parādīsies šeit.", "Other templates will appear here."], "Заказ": ["Pasūtījums", "Order"], "Данные заказа": ["Pasūtījuma dati", "Order details"], "Адрес": ["Adrese", "Address"], "Имя": ["Vārds", "Name"], "Примечание": ["Piezīme", "Note"], "Блоки": ["Bloki", "Blocks"], "Добавить блок": ["Pievienot bloku", "Add block"], "Удалить заказ": ["Dzēst pasūtījumu", "Delete order"], "Цвет": ["Krāsa", "Colour"], "Нажми на размер или отрезок, чтобы изменить (мм)": ["Pieskaries izmēram vai malai, lai mainītu (mm)", "Tap a size or an edge to change it (mm)"], "Готово": ["Gatavs", "Done"], "Размеры": ["Izmēri", "Sizes"], "Добавить список": ["Pievienot sarakstu", "Add list"], "b — только если подоконник клином (края разной ширины). шт — если не указано, 1.": ["b — tikai ja palodze ir ķīļveida (malas dažāda platuma). gab. — ja nav norādīts, 1.", "b — only if the sill is tapered (edges of different width). pcs — 1 if not given."], "Добавить в заказ": ["Pievienot pasūtījumam", "Add to order"], "Сохранить PDF": ["Saglabāt PDF", "Save PDF"], "Сохранить изменения": ["Saglabāt izmaiņas", "Save changes"], "Отмена": ["Atcelt", "Cancel"], "Текущий заказ": ["Pašreizējais pasūtījums", "Current order"], "Подоконники: правка": ["Palodzes: labošana", "Window sills: editing"], "шт": ["gab.", "pcs"], "Добавить позицию": ["Pievienot pozīciju", "Add item"], "Изменить": ["Mainīt", "Edit"], "Удалить": ["Dzēst", "Delete"], "Пока нет блоков": ["Pagaidām nav bloku", "No blocks yet"], "Заказ пуст": ["Pasūtījums ir tukšs", "The order is empty"], "Комментарий к списку": ["Saraksta komentārs", "List comment"], "(не закончен)": ["(nepabeigts)", "(unfinished)"], "строк": ["rindas", "rows"], "Заполни хотя бы одну строку": ["Aizpildi vismaz vienu rindu", "Fill in at least one row"], "Блок добавлен в заказ": ["Bloks pievienots pasūtījumam", "Block added to the order"], "Изменения сохранены": ["Izmaiņas saglabātas", "Changes saved"], "Точно?": ["Tiešām?", "Sure?"], "Очистить текущий заказ?": ["Notīrīt pašreizējo pasūtījumu?", "Clear the current order?"], "Точно удалить заказ?": ["Tiešām dzēst pasūtījumu?", "Really delete the order?"], "Сохранение из раздела пока не готово": ["Saglabāšana no sadaļas vēl nav gatava", "Saving from a section is not ready yet"], "Не загрузилась библиотека PDF": ["PDF bibliotēka neielādējās", "The PDF library did not load"], "Готовлю PDF…": ["Gatavoju PDF…", "Preparing PDF…"], "PDF сохранён": ["PDF saglabāts", "PDF saved"], "PDF сохранён в выбранную папку": ["PDF saglabāts izvēlētajā mapē", "PDF saved to the chosen folder"], "Сохранение отменено": ["Saglabāšana atcelta", "Saving cancelled"], "Не удалось сохранить PDF": ["Neizdevās saglabāt PDF", "Could not save the PDF"], "Папка недоступна, сохраняю в загрузки": ["Mape nav pieejama, saglabāju lejupielādēs", "Folder unavailable, saving to downloads"], "Выбор папки здесь не поддерживается": ["Mapes izvēle šeit netiek atbalstīta", "Choosing a folder is not supported here"], "Папка выбрана": ["Mape izvēlēta", "Folder chosen"], "Не получилось выбрать папку": ["Neizdevās izvēlēties mapi", "Could not choose the folder"], "Не выбрана: файлы идут в загрузки": ["Nav izvēlēta: faili tiek saglabāti lejupielādēs", "Not chosen: files go to downloads"], "Выбери папку, которую создал заранее. Корневые папки (Загрузки, Документы) браузер может не разрешить.": ["Izvēlies iepriekš izveidotu mapi. Pārlūks var neatļaut saknes mapes (Lejupielādes, Dokumenti).", "Choose a folder you created in advance. The browser may not allow top-level folders (Downloads, Documents)."], "Этот браузер не умеет выбирать папку: файлы идут в загрузки.": ["Šis pārlūks nevar izvēlēties mapi: faili tiek saglabāti lejupielādēs.", "This browser cannot choose a folder: files go to downloads."], "мм": ["mm", "mm"], "см": ["cm", "cm"], "м": ["m", "m"], "Размер {0}:": ["Izmērs {0}:", "Size {0}:"], "В работе: заказ от {0}, блоков: {1}": ["Darbā: pasūtījums no {0}, bloki: {1}", "In progress: order from {0}, blocks: {1}"], "Заказа в работе нет": ["Nav pasūtījuma darbā", "No order in progress"], "Папка: {0}": ["Mape: {0}", "Folder: {0}"], "Файл: {0}": ["Fails: {0}", "File: {0}"]};
+const D={"Настройки": ["Iestatījumi", "Settings"], "Новый заказ": ["Jauns pasūtījums", "New order"], "Продолжить": ["Turpināt", "Continue"], "Посмотреть текущий": ["Skatīt pašreizējo", "View current"], "Недописанный заказ запоминается на телефоне.": ["Nepabeigtais pasūtījums tiek saglabāts tālrunī.", "An unfinished order is kept on the phone."], "← Меню": ["← Izvēlne", "← Menu"], "← Назад": ["← Atpakaļ", "← Back"], "Название фирмы": ["Uzņēmuma nosaukums", "Company name"], "Подставляется в название файла после даты.": ["Tiek pievienots faila nosaukumam aiz datuma.", "Added to the file name after the date."], "Папка для PDF": ["PDF mape", "PDF folder"], "Выбрать папку": ["Izvēlēties mapi", "Choose folder"], "Сбросить": ["Atiestatīt", "Reset"], "Язык": ["Valoda", "Language"], "Язык PDF": ["PDF valoda", "PDF language"], "Выбери шаблон": ["Izvēlies veidni", "Choose a template"], "Подоконники": ["Palodzes", "Window sills"], "Произвольные детали": ["Brīvas detaļas", "Custom parts"], "Другие шаблоны появятся здесь.": ["Citas veidnes parādīsies šeit.", "Other templates will appear here."], "Заказ": ["Pasūtījums", "Order"], "Данные заказа": ["Pasūtījuma dati", "Order details"], "Адрес": ["Adrese", "Address"], "Имя": ["Vārds", "Name"], "Примечание": ["Piezīme", "Note"], "Блоки": ["Bloki", "Blocks"], "Добавить блок": ["Pievienot bloku", "Add block"], "Удалить заказ": ["Dzēst pasūtījumu", "Delete order"], "Цвет": ["Krāsa", "Colour"], "Нажми на размер или отрезок, чтобы изменить (мм)": ["Pieskaries izmēram vai malai, lai mainītu (mm)", "Tap a size or an edge to change it (mm)"], "Готово": ["Gatavs", "Done"], "Размеры": ["Izmēri", "Sizes"], "Добавить список": ["Pievienot sarakstu", "Add list"], "b — только если подоконник клином (края разной ширины). шт — если не указано, 1.": ["b — tikai ja palodze ir ķīļveida (malas dažāda platuma). gab. — ja nav norādīts, 1.", "b — only if the sill is tapered (edges of different width). pcs — 1 if not given."], "Добавить в заказ": ["Pievienot pasūtījumam", "Add to order"], "Сохранить PDF": ["Saglabāt PDF", "Save PDF"], "Сохранить изменения": ["Saglabāt izmaiņas", "Save changes"], "Отмена": ["Atcelt", "Cancel"], "Текущий заказ": ["Pašreizējais pasūtījums", "Current order"], "Подоконники: правка": ["Palodzes: labošana", "Window sills: editing"], "шт": ["gab.", "pcs"], "Добавить позицию": ["Pievienot pozīciju", "Add item"], "Изменить": ["Mainīt", "Edit"], "Удалить": ["Dzēst", "Delete"], "Пока нет блоков": ["Pagaidām nav bloku", "No blocks yet"], "Заказ пуст": ["Pasūtījums ir tukšs", "The order is empty"], "Комментарий к списку": ["Saraksta komentārs", "List comment"], "(не закончен)": ["(nepabeigts)", "(unfinished)"], "строк": ["rindas", "rows"], "Заполни хотя бы одну строку": ["Aizpildi vismaz vienu rindu", "Fill in at least one row"], "Блок добавлен в заказ": ["Bloks pievienots pasūtījumam", "Block added to the order"], "Изменения сохранены": ["Izmaiņas saglabātas", "Changes saved"], "Точно?": ["Tiešām?", "Sure?"], "Очистить текущий заказ?": ["Notīrīt pašreizējo pasūtījumu?", "Clear the current order?"], "Точно удалить заказ?": ["Tiešām dzēst pasūtījumu?", "Really delete the order?"], "Сохранение из раздела пока не готово": ["Saglabāšana no sadaļas vēl nav gatava", "Saving from a section is not ready yet"], "Не загрузилась библиотека PDF": ["PDF bibliotēka neielādējās", "The PDF library did not load"], "Готовлю PDF…": ["Gatavoju PDF…", "Preparing PDF…"], "PDF сохранён": ["PDF saglabāts", "PDF saved"], "PDF сохранён в выбранную папку": ["PDF saglabāts izvēlētajā mapē", "PDF saved to the chosen folder"], "Сохранение отменено": ["Saglabāšana atcelta", "Saving cancelled"], "Не удалось сохранить PDF": ["Neizdevās saglabāt PDF", "Could not save the PDF"], "Папка недоступна. Сохраняю в папку Загрузки.": ["Mape nav pieejama. Saglabāju mapē Lejupielādes.", "Folder unavailable. Saving to the Downloads folder."], "Выбор папки здесь не поддерживается": ["Mapes izvēle šeit netiek atbalstīta", "Choosing a folder is not supported here"], "Папка выбрана": ["Mape izvēlēta", "Folder chosen"], "Не получилось выбрать папку": ["Neizdevās izvēlēties mapi", "Could not choose the folder"], "Файлы сохраняются в папку Загрузки.": ["Faili tiek saglabāti mapē Lejupielādes.", "Files are saved to the Downloads folder."], "Выбери папку, которую создал заранее. Корневые папки (Загрузки, Документы) браузер может не разрешить.": ["Izvēlies iepriekš izveidotu mapi. Pārlūks var neatļaut saknes mapes (Lejupielādes, Dokumenti).", "Choose a folder you created in advance. The browser may not allow top-level folders (Downloads, Documents)."], "Этот браузер не умеет выбирать папку. Файлы сохраняются в папку Загрузки.": ["Šis pārlūks nevar izvēlēties mapi. Faili tiek saglabāti mapē Lejupielādes.", "This browser cannot choose a folder. Files are saved to the Downloads folder."], "мм": ["mm", "mm"], "см": ["cm", "cm"], "м": ["m", "m"], "Размер {0}:": ["Izmērs {0}:", "Size {0}:"], "В работе: заказ от {0}, блоков: {1}": ["Darbā: pasūtījums no {0}, bloki: {1}", "In progress: order from {0}, blocks: {1}"], "Заказа в работе нет": ["Nav pasūtījuma darbā", "No order in progress"], "Папка: {0}": ["Mape: {0}", "Folder: {0}"], "Файл: {0}": ["Fails: {0}", "File: {0}"], "Нажми на отрезок или угол, чтобы изменить. Плюс на конце добавляет отрезок.": ["Pieskaries malai vai leņķim, lai mainītu. Pluss galā pievieno malu.", "Tap an edge or an angle to change it. The plus at an end adds an edge."], "Угол между отрезками, °": ["Leņķis starp malām, °", "Angle between edges, °"], "Длина отрезка, мм": ["Malas garums, mm", "Edge length, mm"], "Сторона": ["Puse", "Side"], "Удалить отрезок": ["Dzēst malu", "Delete edge"], "Зеркало": ["Spogulis", "Mirror"], "Нажми на отрезок или угол, чтобы изменить. Плюс на конце открывает меню.": ["Pieskaries malai vai leņķim, lai mainītu. Pluss galā atver izvēlni.", "Tap an edge or an angle to change it. The plus at an end opens a menu."], "Добавить отрезок": ["Pievienot malu", "Add edge"], "Скопировать всё зеркально": ["Kopēt visu spoguļveidā", "Mirror-copy everything"], "Завершающий загиб": ["Noslēdzošais salocījums", "Final hem"], "Длина загиба, мм": ["Salocījuma garums, mm", "Hem length, mm"], "Удалить загиб": ["Dzēst salocījumu", "Delete hem"], "0° — прижато до конца": ["0° — piespiests līdz galam", "0° — pressed flat"], "Сначала нажми на угол — ось симметрии": ["Vispirms pieskaries leņķim — simetrijas asij", "First tap the angle that is the axis of symmetry"]};
 let lang=cfg.lang||((navigator.language||'ru').slice(0,2));if(!['ru','lv','en'].includes(lang))lang='en';
 const T=(ru,...a)=>{const d=D[ru];let t=(lang==='ru'||!d)?ru:d[lang==='lv'?0:1];a.forEach((v,i)=>{t=t.replace('{'+i+'}',v)});return t};
 const du=u=>lang==='ru'?u:un(u);
@@ -374,8 +424,8 @@ const fname=()=>{const c=(cfg.co||'').replace(/[\\/:*?"<>|]/g,'').trim();return 
 const idb=()=>new Promise((res,rej)=>{const r=indexedDB.open('zamery-db',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
 const kvGet=async k=>{const d=await idb();return new Promise((res,rej)=>{const q=d.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})};
 const kvSet=async(k,v)=>{const d=await idb();return new Promise((res,rej)=>{const t=d.transaction('kv','readwrite');if(v===undefined)t.objectStore('kv').delete(k);else t.objectStore('kv').put(v,k);t.oncomplete=()=>res();t.onerror=()=>rej(t.error)})};
-async function showDir(){let h=null;try{h=await kvGet('dir')}catch(e){}$('dirname').textContent=h?T('Папка: {0}',h.name):T('Не выбрана: файлы идут в загрузки');
-  $('dirhint').textContent=window.showDirectoryPicker?'Выбери папку, которую создал заранее. Корневые папки (Загрузки, Документы) браузер может не разрешить.':'Этот браузер не умеет выбирать папку: файлы идут в загрузки.'}
+async function showDir(){let h=null;try{h=await kvGet('dir')}catch(e){}$('dirname').textContent=h?T('Папка: {0}',h.name):T('Файлы сохраняются в папку Загрузки.');
+  $('dirhint').textContent=window.showDirectoryPicker?'Выбери папку, которую создал заранее. Корневые папки (Загрузки, Документы) браузер может не разрешить.':'Этот браузер не умеет выбирать папку. Файлы сохраняются в папку Загрузки.'}
 function renderSet(){$('co').value=cfg.co||'';$('lg').value=lang;$('pl').value=cfg.pdfLang||'lv';showDir()}
 $('pl').onchange=e=>{cfg.pdfLang=e.target.value;saveCfg()};
 $('co').addEventListener('input',e=>{cfg.co=e.target.value;saveCfg()});
@@ -391,10 +441,240 @@ $('clrDir').onclick=async()=>{try{await kvSet('dir',undefined)}catch(e){}showDir
 $('goSet').onclick=()=>show('set');$('bkS').onclick=()=>show('home');
 async function uniq(h,name){const base=name.replace(/\.pdf$/,'');let n=name,i=1;for(;;){try{await h.getFileHandle(n);i++;n=base+' ('+i+').pdf'}catch(e){return n}}}
 async function savePdf(blob,name,h){
-  if(h){try{const fh=await h.getFileHandle(await uniq(h,name),{create:true});const w=await fh.createWritable();await w.write(blob);await w.close();return 'folder'}catch(e){toast('Папка недоступна, сохраняю в загрузки')}}
+  if(h){try{const fh=await h.getFileHandle(await uniq(h,name),{create:true});const w=await fh.createWritable();await w.write(blob);await w.close();return 'folder'}catch(e){toast('Папка недоступна. Сохраняю в папку Загрузки.')}}
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();return 'download';
 }
-restore();load();show(scr==='tpl'&&!order.active?'home':scr);document.documentElement.lang=lang;applyLang(document.body);
+function chain(part,gap){
+  gap=gap||0;const S=[];let th=(part.rot||0)*Math.PI/180,cx=0,cy=0;
+  part.segs.forEach((L,i)=>{const l=+L||0,a=[cx,cy],b=[cx+l*Math.cos(th),cy+l*Math.sin(th)];S.push({a,b,th});cx=b[0];cy=b[1];
+    if(i<part.joints.length){const j=part.joints[i],aa=(j.a===undefined||j.a===''||isNaN(+j.a))?90:+j.a;
+      if(aa<0.5){const d=[Math.cos(th),Math.sin(th)],n=[-d[1],d[0]],sg=j.s||1;cx+=n[0]*gap*sg;cy+=n[1]*gap*sg;th+=Math.PI}
+      else th+=(180-aa)*(j.s||1)*Math.PI/180}});
+  const H={},f=S[0],l=S[S.length-1];
+  if(part.hemE){const h=part.hemE,d=[Math.cos(l.th),Math.sin(l.th)],n=[-d[1],d[0]],s=h.s||1,L=+h.l||0,a=[l.b[0]+n[0]*gap*s,l.b[1]+n[1]*gap*s];H.E={a,b:[a[0]-d[0]*L,a[1]-d[1]*L],n:[n[0]*s,n[1]*s]}}
+  if(part.hemS){const h=part.hemS,d=[Math.cos(f.th),Math.sin(f.th)],n=[-d[1],d[0]],s=h.s||1,L=+h.l||0,a=[f.a[0]+n[0]*gap*s,f.a[1]+n[1]*gap*s];H.S={a,b:[a[0]+d[0]*L,a[1]+d[1]*L],n:[n[0]*s,n[1]*s]}}
+  return {S,H};
+}
+function chainSvg(part,o){
+  o=o||{};const col=o.col||'var(--fg)',acc=o.acc||'var(--ac)',bg=o.bg||'var(--card)',sel=o.sel,W=340,Hh=190,pad=38;
+  const pts=C=>{const p=[];C.S.forEach(s=>p.push(s.a,s.b));['E','S'].forEach(k=>{if(C.H[k])p.push(C.H[k].a,C.H[k].b)});return p};
+  const rg=a=>[Math.min(...a),Math.max(...a)];
+  let C=chain(part,0),ps=pts(C),[x0,x1]=rg(ps.map(p=>p[0])),[y0,y1]=rg(ps.map(p=>p[1]));
+  const sc=Math.min((W-2*pad)/((x1-x0)||1),(Hh-2*pad)/((y1-y0)||1));
+  C=chain(part,4.4/sc);ps=pts(C);[x0,x1]=rg(ps.map(p=>p[0]));[y0,y1]=rg(ps.map(p=>p[1]));
+  const ox=(W-(x1-x0)*sc)/2-x0*sc,oy=(Hh-(y1-y0)*sc)/2-y0*sc,f=n=>Math.round(n*10)/10;
+  const T=p=>[p[0]*sc+ox,p[1]*sc+oy],un=(a,b)=>{const dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy);return l?[dx/l,dy/l]:[1,0]};
+  const ln=(p,q,c,w,x)=>`<line x1="${f(p[0])}" y1="${f(p[1])}" x2="${f(q[0])}" y2="${f(q[1])}" stroke="${c}" stroke-width="${w}" stroke-linecap="round"${x||''}/>`;
+  const txt=(x,y,t,c,sz)=>`<text x="${f(x)}" y="${f(y)}" font-size="${sz||12}" text-anchor="middle" fill="${c}" stroke="${bg}" stroke-width="3" paint-order="stroke">${t}</text>`;
+  let h='',hit='';
+  if(o.grid){h+='<g stroke="'+col+'" stroke-opacity=".09" stroke-width="1">';for(let x=0;x<=W;x+=20)h+=`<line x1="${x}" y1="0" x2="${x}" y2="${Hh}"/>`;for(let y=0;y<=Hh;y+=20)h+=`<line x1="0" y1="${y}" x2="${W}" y2="${Hh>y?y:Hh}"/>`;h+='</g>'}
+  const Q=C.S.map(s=>[T(s.a),T(s.b)]);
+  const all=[];Q.forEach(q=>all.push(q[0],q[1]));
+  const cen=[all.reduce((a,p)=>a+p[0],0)/all.length,all.reduce((a,p)=>a+p[1],0)/all.length];
+  const hemQ=['E','S'].map(k=>C.H[k]?[T(C.H[k].a),T(C.H[k].b)]:null);
+  const lines=Q.concat(hemQ.filter(Boolean));
+  const occ=[],tw=t=>String(t).length*6.8+6,rectAt=(cx,cy,t)=>{const w=tw(t),hh=13;return{x0:cx-w/2,y0:cy-hh/2,x1:cx+w/2,y1:cy+hh/2}};
+  const ov=(p,q)=>p.x0<q.x1&&p.x1>q.x0&&p.y0<q.y1&&p.y1>q.y0;
+  const inC=r=>r.x0>=1&&r.y0>=1&&r.x1<=W-1&&r.y1<=Hh-1;
+  const hitLine=r=>{for(const [p,q] of lines){const l=Math.hypot(q[0]-p[0],q[1]-p[1]),n=Math.max(2,Math.ceil(l/3));for(let t=0;t<=n;t++){const x=p[0]+(q[0]-p[0])*t/n,y=p[1]+(q[1]-p[1])*t/n;if(x>r.x0-2&&x<r.x1+2&&y>r.y0-2&&y<r.y1+2)return true}}return false};
+  const dseg=(x,y,p,q)=>{const dx=q[0]-p[0],dy=q[1]-p[1],l2=dx*dx+dy*dy||1;let t=((x-p[0])*dx+(y-p[1])*dy)/l2;t=Math.max(0,Math.min(1,t));return Math.hypot(x-(p[0]+t*dx),y-(p[1]+t*dy))};
+  const leaderOk=(M,E,own)=>{for(let t=0.15;t<=1;t+=0.1){const x=M[0]+(E[0]-M[0])*t,y=M[1]+(E[1]-M[1])*t;for(const ln2 of lines){if(ln2===own)continue;if(dseg(x,y,ln2[0],ln2[1])<3)return false}}return true};
+  const free=r=>inC(r)&&!hitLine(r)&&!occ.some(q=>ov(r,q));
+  const rot=(v,deg)=>{const a=deg*Math.PI/180,c=Math.cos(a),s=Math.sin(a);return[v[0]*c-v[1]*s,v[0]*s+v[1]*c]};
+  const place=(M,nOut,text,own)=>{
+    const sides=[nOut,[-nOut[0],-nOut[1]]];
+    for(const s of sides){const dd=5+Math.abs(s[0])*tw(text)/2+Math.abs(s[1])*6.5,c=[M[0]+s[0]*dd,M[1]+s[1]*dd],r=rectAt(c[0],c[1],text);if(free(r)){occ.push(r);return{c,leader:null}}}
+    for(const dist of [24,34,46])for(const dg of [0,40,-40,80,-80])for(const s of sides){
+      const dir=rot(s,dg),E=[M[0]+dir[0]*dist,M[1]+dir[1]*dist],sx=E[0]>=M[0]?1:-1,sw=tw(text)+2,S=[E[0]+sx*sw,E[1]],c=[E[0]+sx*sw/2,E[1]-8],r=rectAt(c[0],c[1],text);
+      if(free(r)&&leaderOk(M,E,own)){occ.push(r);return{c,leader:[M,E,S]}}}
+    const c=[M[0]+nOut[0]*11,M[1]+nOut[1]*11];occ.push(rectAt(c[0],c[1],text));return{c,leader:null};
+  };
+  const drawLabel=(pl,text,c,attr)=>{
+    let r='';
+    if(pl.leader){const L=pl.leader;r+=`<polyline points="${L.map(p=>f(p[0])+','+f(p[1])).join(' ')}" fill="none" stroke="${c}" stroke-width=".9" opacity=".85"/><circle cx="${f(L[0][0])}" cy="${f(L[0][1])}" r="1.5" fill="${c}"/>`}
+    r+=txt(pl.c[0],pl.c[1]+4,text,c,12);
+    if(o.edit)hit+=`<circle ${attr} cx="${f(pl.c[0])}" cy="${f(pl.c[1])}" r="13" fill="transparent"/>`;
+    return r;
+  };
+  const sideOf=(p,q)=>{const d=un(p,q),n=[-d[1],d[0]],m=[(p[0]+q[0])/2,(p[1]+q[1])/2];return (n[0]*(m[0]-cen[0])+n[1]*(m[1]-cen[1]))>=0?1:-1};
+  // angle labels first (fixed obstacles)
+  const angPl=[];
+  part.joints.forEach((j,i)=>{
+    const v=Q[i][1],u1=un(v,Q[i][0]),u2=un(v,Q[i+1][1]);let b=[u1[0]+u2[0],u1[1]+u2[1]];const bl=Math.hypot(b[0],b[1]);
+    b=bl<0.3?[-u2[1],u2[0]]:[b[0]/bl,b[1]/bl];
+    let c=[v[0]+b[0]*25,v[1]+b[1]*25];
+    for(const dist of [25,33,42]){const cc=[v[0]+b[0]*dist,v[1]+b[1]*dist],r=rectAt(cc[0],cc[1],j.a+'°');if(free(r)){c=cc;break}}
+    if(+j.a<179.5&&+j.a>=0.5)occ.push(rectAt(c[0],c[1],j.a+'°'));
+    angPl.push({v,u1,u2,c});
+  });
+  Q.forEach(([p,q],i)=>{
+    const on=sel&&((sel.k==='s'&&sel.i===i)||(sel.k==='p'&&sel.s===i));
+    if(on)h+=ln(p,q,acc,5);
+    h+=ln(p,q,col,2.2);
+    const d=un(p,q),sd=sideOf(p,q),M=[(p[0]+q[0])/2,(p[1]+q[1])/2];
+    h+=drawLabel(place(M,[-d[1]*sd,d[0]*sd],part.segs[i],Q[i]),part.segs[i],on?acc:col,`data-s="${i}"`);
+    if(o.edit)hit+=ln(p,q,'transparent',22,` data-s="${i}"`);
+  });
+  ['E','S'].forEach((k,ki)=>{const e=C.H[k];if(!e)return;const p=T(e.a),q=T(e.b),on=sel&&sel.k==='h'&&sel.e===k;
+    const base=k==='E'?C.S[C.S.length-1]:C.S[0],bp=T(k==='E'?base.b:base.a),dpx=un(T(base.a),T(base.b)),sg=k==='E'?1:-1;
+    const M0=[(bp[0]+p[0])/2,(bp[1]+p[1])/2],r=Math.hypot(p[0]-bp[0],p[1]-bp[1])/2,Qp=[M0[0]+dpx[0]*r*sg,M0[1]+dpx[1]*r*sg];
+    const cr=(bp[0]-M0[0])*(Qp[1]-M0[1])-(bp[1]-M0[1])*(Qp[0]-M0[0]);
+    const arc=`<path d="M${f(bp[0])} ${f(bp[1])} A${f(r)} ${f(r)} 0 0 ${cr>0?1:0} ${f(p[0])} ${f(p[1])}" fill="none" stroke="${on?acc:col}" stroke-width="2.2" stroke-linecap="round"/>`;
+    if(on)h+=ln(p,q,acc,5);h+=ln(p,q,col,2.2)+arc;
+    const M=[(p[0]+q[0])/2,(p[1]+q[1])/2];
+    h+=drawLabel(place(M,e.n,part['hem'+k].l,hemQ[ki]),part['hem'+k].l,on?acc:col,`data-h="${k}"`);
+    if(o.edit)hit+=ln(p,q,'transparent',22,` data-h="${k}"`)});
+  part.joints.forEach((j,i)=>{
+    const {v,u1,u2,c:lc}=angPl[i],on=sel&&((sel.k==='j'&&sel.i===i)||(sel.k==='p'&&sel.j===i)),c=on?acc:col,a=+j.a;
+    if(on)h+=`<circle cx="${f(v[0])}" cy="${f(v[1])}" r="3.5" fill="${acc}"/>`;
+    if(o.edit&&o.axis===i)h+=`<circle cx="${f(v[0])}" cy="${f(v[1])}" r="9" fill="none" stroke="${acc}" stroke-width="1.5"/>`;
+    if(a<0.5){const p0=Q[i][1],p1=Q[i+1][0],dpx=un(Q[i][0],Q[i][1]),M0=[(p0[0]+p1[0])/2,(p0[1]+p1[1])/2],r=Math.hypot(p1[0]-p0[0],p1[1]-p0[1])/2,Qp=[M0[0]+dpx[0]*r,M0[1]+dpx[1]*r],cr=(p0[0]-M0[0])*(Qp[1]-M0[1])-(p0[1]-M0[1])*(Qp[0]-M0[0]);
+      h+=`<path d="M${f(p0[0])} ${f(p0[1])} A${f(r)} ${f(r)} 0 0 ${cr>0?1:0} ${f(p1[0])} ${f(p1[1])}" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round"/>`}
+    else if(a<179.5){
+      if(Math.abs(a-90)<0.5){const s=9,A=[v[0]+u1[0]*s,v[1]+u1[1]*s],B=[A[0]+u2[0]*s,A[1]+u2[1]*s],Cc=[v[0]+u2[0]*s,v[1]+u2[1]*s];
+        h+=`<path d="M${f(A[0])} ${f(A[1])} L${f(B[0])} ${f(B[1])} L${f(Cc[0])} ${f(Cc[1])}" fill="none" stroke="${c}" stroke-width="1.1"/>`}
+      else{const r=11,A=[v[0]+u1[0]*r,v[1]+u1[1]*r],B=[v[0]+u2[0]*r,v[1]+u2[1]*r],sw=(u1[0]*u2[1]-u1[1]*u2[0])>0?1:0;
+        h+=`<path d="M${f(A[0])} ${f(A[1])} A${r} ${r} 0 0 ${sw} ${f(B[0])} ${f(B[1])}" fill="none" stroke="${c}" stroke-width="1.1"/>`}
+      h+=txt(lc[0],lc[1]+4,a+'°',c,11);
+    }
+    if(o.edit)hit+=`<circle data-j="${i}" cx="${f(v[0])}" cy="${f(v[1])}" r="14" fill="transparent"/>`;
+  });
+  if(o.edit){
+    const n=Q.length-1,d0=un(Q[0][0],Q[0][1]),d1=un(Q[n][0],Q[n][1]);
+    [['start',[Q[0][0][0]-d0[0]*22,Q[0][0][1]-d0[1]*22],part.hemS],['end',[Q[n][1][0]+d1[0]*22,Q[n][1][1]+d1[1]*22],part.hemE]].forEach(([k,c,hm])=>{
+      if(hm)return;
+      hit+=`<g data-end="${k}"><circle cx="${f(c[0])}" cy="${f(c[1])}" r="11" fill="var(--card)" stroke="${acc}" stroke-width="1.5" stroke-dasharray="3 2"/><text x="${f(c[0])}" y="${f(c[1])+5}" font-size="16" text-anchor="middle" fill="${acc}">+</text></g>`});
+  }
+  return h+hit;
+}
+
+function draftCFilled(){const p=draftC.part;return !!(draftC.clr||p.segs.length>1||p.segs[0]!==100||p.hemS||p.hemE||draftC.lists.some(l=>l.c||l.rows.some(r=>r.l||r.q)))}
+function chainSheet(part){return `<svg viewBox="0 0 340 190" style="width:115mm;display:block;margin:1mm 0 2mm">`+chainSvg(part,{col:'#111',acc:'#111',bg:'#fff'})+`</svg>`}
+let axisJ=null,menuEnd=null,autoAxis=false,undoS=[],redoS=[],view={z:1,cx:170,cy:95};
+const jIdx=()=>selC?(selC.k==='j'?selC.i:selC.k==='p'?selC.j:-1):-1;
+const sIdx=()=>selC?(selC.k==='s'?selC.i:selC.k==='p'?selC.s:-1):-1;
+function applyView(){const v=view,w=340/v.z,h=190/v.z;v.cx=Math.max(w/2,Math.min(340-w/2,v.cx));v.cy=Math.max(h/2,Math.min(190-h/2,v.cy));$('csk').setAttribute('viewBox',`${v.cx-w/2} ${v.cy-h/2} ${w} ${h}`)}
+function drawC(){applyView();$('csk').innerHTML=chainSvg(curC.part,{edit:true,grid:true,sel:selC,axis:axisJ})}
+function openPop(mode){$('cpop').hidden=false;$('pmenu').hidden=mode!=='menu';$('pedit').hidden=mode!=='edit'}
+function closePop(){$('cpop').hidden=true;selC=null;menuEnd=null;drawC()}
+function showEd(){
+  if(!selC){closePop();return}
+  const k=selC.k,ji=jIdx(),si=sIdx(),P=curC.part;
+  openPop('edit');
+  $('rA').hidden=!(k==='j'||k==='p');$('rL').hidden=!(k==='s'||k==='p');$('rH').hidden=k!=='h';
+  $('flipJ').hidden=!(k==='j'||k==='p'||k==='h');$('delS').hidden=!(k==='s'&&P.segs.length>1);$('delH').hidden=k!=='h';
+  if(ji>=0)$('iA').value=P.joints[ji].a;
+  if(si>=0)$('iL').value=P.segs[si];
+  if(k==='h')$('iH').value=P['hem'+selC.e].l;
+  drawC();
+}
+function focusEd(){const k=selC.k,t=(k==='j'||k==='p')?$('iA'):k==='s'?$('iL'):$('iH');t.focus();t.select()}
+function addAt(end){
+  pushUndo();const P=curC.part;
+  if(end==='end'){P.joints.push({a:90,s:1});P.segs.push(50);selC={k:'p',j:P.joints.length-1,s:P.segs.length-1}}
+  else{P.rot=(P.rot||0)-90;P.joints.unshift({a:90,s:1});P.segs.unshift(50);if(axisJ!==null)axisJ++;selC={k:'p',j:0,s:0}}
+  showEd();focusEd();
+}
+const snap=()=>JSON.stringify({part:curC.part,axis:axisJ});
+const updUndo=()=>{$('undo').disabled=!undoS.length;$('redo').disabled=!redoS.length};
+function pushUndo(){undoS.push(snap());if(undoS.length>60)undoS.shift();redoS=[];updUndo()}
+function applySnap(t){const o=JSON.parse(t);curC.part=o.part;axisJ=o.axis;selC=null;$('cpop').hidden=true;drawC();updUndo()}
+$('undo').onclick=()=>{if(!undoS.length)return;redoS.push(snap());applySnap(undoS.pop())};
+$('redo').onclick=()=>{if(!redoS.length)return;undoS.push(snap());applySnap(redoS.pop())};
+function orientAxis(){
+  const P=curC.part,ai=axisJ;if(ai===null||ai<0||ai>=P.joints.length)return;
+  const S2=chain(P).S,v=S2[ai].b,u=p=>{const dx=p[0]-v[0],dy=p[1]-v[1],l=Math.hypot(dx,dy)||1;return[dx/l,dy/l]};
+  const u1=u(S2[ai].a),u2=u(S2[ai+1].b),bx=u1[0]+u2[0],by=u1[1]+u2[1];
+  if(Math.hypot(bx,by)>0.05)P.rot=nrm((P.rot||0)+(Math.PI/2-Math.atan2(by,bx))*180/Math.PI);
+}
+function symCopy(end){
+  pushUndo();
+  const P=curC.part,rev=x=>x.slice().reverse(),cp=j=>Object.assign({},j),n=P.segs.length,before=chain(P).S;
+  const ref=P.joints.length?(end==='end'?P.joints[P.joints.length-1]:P.joints[0]):null,mid={a:90,s:(ref&&ref.s)||1};
+  if(end==='end'){
+    P.segs=P.segs.concat(rev(P.segs));P.joints=P.joints.map(cp).concat([mid],rev(P.joints).map(cp));
+    P.hemE=P.hemS?cp(P.hemS):null;
+  }else{
+    const th0=before[0].th;
+    P.segs=rev(P.segs).concat(P.segs);P.joints=rev(P.joints).map(cp).concat([mid],P.joints.map(cp));
+    P.hemS=P.hemE?cp(P.hemE):null;
+    P.rot=(P.rot||0)+(th0-chain(P).S[n].th)*180/Math.PI;
+  }
+  axisJ=n-1;autoAxis=true;orientAxis();
+  selC={k:'j',i:axisJ};showEd();focusEd();
+}
+$('csk').addEventListener('click',e=>{
+  const el=e.target.closest('[data-s],[data-j],[data-h],[data-end]');if(!el)return;const d=el.dataset;
+  if(d.end!==undefined){menuEnd=d.end;selC=null;$('mHem').hidden=!!curC.part['hem'+(d.end==='end'?'E':'S')];openPop('menu');drawC();return}
+  pushUndo();
+  if(d.s!==undefined)selC={k:'s',i:+d.s};
+  else if(d.j!==undefined)selC={k:'j',i:+d.j};
+  else selC={k:'h',e:d.h};
+  showEd();focusEd();
+});
+$('mAdd').onclick=()=>{const e=menuEnd;$('cpop').hidden=true;addAt(e)};
+$('mSym').onclick=()=>symCopy(menuEnd);
+$('mHem').onclick=()=>{pushUndo();const e=menuEnd==='end'?'E':'S';curC.part['hem'+e]={l:15,s:1};selC={k:'h',e};showEd();focusEd()};
+$('mCancel').onclick=()=>closePop();
+$('iA').addEventListener('input',e=>{const i=jIdx();if(i<0)return;const v=parseFloat(e.target.value);if(isNaN(v)||v<0)return;curC.part.joints[i].a=Math.min(180,v);if(autoAxis&&i===axisJ)orientAxis();drawC()});
+$('iL').addEventListener('input',e=>{const i=sIdx();if(i<0)return;const v=parseFloat(e.target.value);curC.part.segs[i]=v>0?v:0;drawC()});
+$('iH').addEventListener('input',e=>{if(!selC||selC.k!=='h')return;const v=parseFloat(e.target.value);curC.part['hem'+selC.e].l=v>0?v:0;drawC()});
+$('flipJ').onclick=()=>{
+  if(selC&&selC.k==='h'){const h=curC.part['hem'+selC.e];h.s=-(h.s||1)}
+  else{const i=jIdx();if(i<0)return;const j=curC.part.joints[i];j.s=-(j.s||1)}
+  drawC()};
+$('delS').onclick=()=>{const i=sIdx(),P=curC.part;if(i<0||P.segs.length<2)return;P.segs.splice(i,1);const dj=i>0?i-1:0;P.joints.splice(dj,1);
+  if(axisJ===dj)axisJ=null;else if(axisJ!==null&&axisJ>dj)axisJ--;closePop()};
+$('delH').onclick=()=>{if(selC&&selC.k==='h')curC.part['hem'+selC.e]=null;closePop()};
+$('cedok').onclick=()=>closePop();
+const nrm=a=>{a=a%360;return a>180?a-360:a<=-180?a+360:a};
+const flipAll=()=>{curC.part.joints.forEach(j=>{j.s=-(j.s||1)});['hemS','hemE'].forEach(k=>{if(curC.part[k])curC.part[k].s=-(curC.part[k].s||1)})};
+$('rotL').onclick=()=>{pushUndo();autoAxis=false;curC.part.rot=nrm((curC.part.rot||0)-5);drawC()};
+$('rotR').onclick=()=>{pushUndo();autoAxis=false;curC.part.rot=nrm((curC.part.rot||0)+5);drawC()};
+$('mH').onclick=()=>{pushUndo();autoAxis=false;curC.part.rot=nrm(180-(curC.part.rot||0));flipAll();drawC()};
+$('mV').onclick=()=>{pushUndo();autoAxis=false;curC.part.rot=nrm(-(curC.part.rot||0));flipAll();drawC()};
+$('zIn').onclick=()=>{view.z=Math.min(8,view.z*1.4);drawC()};
+$('zOut').onclick=()=>{view.z=Math.max(1,view.z/1.4);drawC()};
+$('zFit').onclick=()=>{view={z:1,cx:170,cy:95};drawC()};
+let pinch=null;
+const pInfo=e=>{const a=e.touches[0],b=e.touches[1];return{d:Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY),x:(a.clientX+b.clientX)/2,y:(a.clientY+b.clientY)/2}};
+$('csk').addEventListener('touchstart',e=>{if(e.touches.length===2)pinch=pInfo(e)},{passive:true});
+$('csk').addEventListener('touchmove',e=>{if(e.touches.length===2&&pinch){e.preventDefault();const n=pInfo(e),r=$('csk').getBoundingClientRect();
+  view.z=Math.max(1,Math.min(8,view.z*n.d/pinch.d));const k=r.width/(340/view.z);view.cx-=(n.x-pinch.x)/k;view.cy-=(n.y-pinch.y)/k;pinch=n;drawC()}},{passive:false});
+$('csk').addEventListener('touchend',e=>{if(e.touches.length<2)pinch=null});
+$('cclr').addEventListener('input',e=>{const t=e.target,p=t.selectionStart;t.value=t.value.toUpperCase();t.setSelectionRange(p,p);curC.clr=t.value});
+$('cul').onchange=e=>{curC.ul=e.target.value;clists()};
+function clists(){
+  $('clists').innerHTML=curC.lists.map((L,li)=>`<div style="margin-bottom:16px">
+<div style="display:flex;gap:6px;margin-bottom:6px"><input data-li="${li}" data-k="c" value="${esc(L.c)}" placeholder="Комментарий к списку" style="text-align:left">${curC.lists.length>1?`<button class="x" data-dl="${li}">✕</button>`:''}</div>
+<table><thead><tr><th></th><th>l (${du(curC.ul)})</th><th>шт</th><th></th></tr></thead><tbody>`+
+  L.rows.map((r,i)=>`<tr><td><span class="n">${i+1}</span></td>
+<td><input data-li="${li}" data-i="${i}" data-k="l" value="${esc(r.l)}" inputmode="decimal"></td>
+<td><input data-li="${li}" data-i="${i}" data-k="q" value="${esc(r.q)}" placeholder="1" inputmode="numeric"></td>
+<td><button class="x" data-li="${li}" data-del="${i}" ${L.rows.length<2?'disabled':''}>✕</button></td></tr>`).join('')+
+  `</tbody></table><button class="add" data-addrow="${li}">Добавить позицию</button></div>`).join('');
+}
+$('clists').addEventListener('input',e=>{const x=e.target.dataset;if(x.li===undefined)return;const L=curC.lists[+x.li];if(x.i!==undefined)L.rows[+x.i][x.k]=e.target.value;else if(x.k==='c')L.c=e.target.value});
+$('clists').addEventListener('click',e=>{const t=e.target,x=t.dataset;
+  if(x.addrow!==undefined){curC.lists[+x.addrow].rows.push({l:'',q:''});clists()}
+  else if(x.del!==undefined){const L=curC.lists[+x.li];if(L.rows.length>1){L.rows.splice(+x.del,1);clists()}}
+  else if(x.dl!==undefined)two(t,'Точно?',()=>{curC.lists.splice(+x.dl,1);clists()})});
+$('addCList').onclick=()=>{curC.lists.push({c:'',rows:[{l:'',q:''}]});clists()};
+function loadC(){
+  $('cclr').value=curC.clr;$('cul').value=curC.ul;selC=null;axisJ=null;autoAxis=false;undoS=[];redoS=[];updUndo();menuEnd=null;$('cpop').hidden=true;view={z:1,cx:170,cy:95};drawC();clists();
+  const e=editing!==null&&et==='cust';
+  $('addC').hidden=e;$('saveC').hidden=!e;$('cancelC').hidden=!e;
+}
+$('addC').onclick=()=>{
+  if(!filled(curC).length){toast('Заполни хотя бы одну строку');return}
+  order.blocks.push(cl(curC));draftC=nc();curC=draftC;loadC();show('hub');toast('Блок добавлен в заказ');
+};
+$('saveC').onclick=()=>{order.blocks[editing]=cl(curC);editing=null;curC=draftC;loadC();show('hub');toast('Изменения сохранены')};
+$('cancelC').onclick=()=>{editing=null;curC=draftC;loadC();show('hub')};
+$('bkC').onclick=()=>{if(editing!==null){editing=null;curC=draftC;loadC()}show('hub')};
+$('tplCust').onclick=()=>{editing=null;et='cust';curC=draftC;loadC();show('cust')};
+$('goCust').onclick=()=>{editing=null;et='cust';curC=draftC;loadC();show('cust')};
+restore();load();loadC();show(scr==='tpl'&&!order.active?'home':scr);document.documentElement.lang=lang;applyLang(document.body);
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
 </script></body></html>
