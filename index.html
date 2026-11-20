@@ -31,9 +31,17 @@ td{padding:3px}
 .add{width:100%;margin-top:8px;border-style:dashed}
 svg{width:100%;display:block;-webkit-tap-highlight-color:transparent}
 .card{position:relative}
-.clr{position:absolute;top:10px;right:10px;width:130px}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:6px 0 12px}.hrow h1{margin:0;min-width:0}.hrow input{width:100px;flex:none;padding:9px 4px}.hrow input:not(:placeholder-shown){text-transform:uppercase}
+.dng{color:var(--ac)}
+.ha,.hb,.hl{white-space:nowrap}
+.un{padding:2px 7px;margin:0;border:1px solid var(--ac);border-radius:8px;background:none;color:var(--ac);font:inherit;font-size:13px}
+.upop{position:absolute;z-index:60;background:var(--card);border:2px solid var(--ac);border-radius:12px;padding:5px;display:flex;flex-direction:column;gap:3px;min-width:68px}
+.upop.ask{width:230px}.upop .q{padding:6px 8px 8px;text-align:center;font-size:15px}.upop .yn{display:flex;gap:6px}.upop .yn button{flex:1}
+.upop button{text-align:center;padding:7px 12px;font-size:15px}.upop button.cur{background:var(--ac);color:var(--bg);border-color:var(--ac)}
+.tools.tbar{flex-wrap:nowrap;margin:0 0 8px}.tools.tbar button{white-space:nowrap;padding:8px 10px;font-size:15px}.tools.tbar .grow{flex:1}
+.tools2{display:flex;gap:4px;margin-top:8px}.tools2 button{flex:1;min-width:0;padding:8px 0;display:inline-flex;align-items:center;justify-content:center}.tools2 svg{width:22px;height:22px;display:block}
 .hint{font-size:12px;color:var(--mu);text-align:center;margin-top:6px}
-.ed{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:8px}
+.ed{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:8px}.ed button{min-width:110px}
 .ed input{width:90px}
 .seg{cursor:pointer}
 
@@ -120,14 +128,13 @@ button:disabled{opacity:.4}
 <button class="menu" id="goSill">Подоконники</button>
 <button class="menu" id="goCust" style="margin-top:8px">Произвольные детали</button></div>
 <button class="big" id="viewO2">Посмотреть текущий</button>
-<button class="big" id="delO">Удалить заказ</button>
+<button class="big dng" id="delO">Удалить заказ</button>
 </div>
 
 <div id="sill" hidden>
 <button class="back" id="bk2">← Назад</button>
-<h1 id="stitle">Подоконники</h1>
+<div class="hrow"><h1 id="stitle">Подоконники</h1><input id="clr" type="text" placeholder="Цвет" autocapitalize="characters" autocomplete="off" aria-label="Цвет"></div>
 <div class="card">
-<div class="clr"><label>Цвет<input id="clr" type="text" autocapitalize="characters" style="text-transform:uppercase"></label></div>
 <svg id="sk" viewBox="0 0 380 240" role="img"><title>Подоконник в объёме</title>
 <polygon points="40,150 235,150 312,105 160,105" fill="var(--ac)" opacity=".10"/>
 <polygon points="235,150 239.4,194.8 315.4,139.9 312,105" fill="var(--ac)" opacity=".18"/>
@@ -164,13 +171,11 @@ button:disabled{opacity:.4}
 </g>
 </svg>
 <div class="hint">Нажми на размер или отрезок, чтобы изменить (мм)</div>
-<div class="ed" id="ed" hidden><span id="edl"></span><input id="edi" type="number" inputmode="decimal"><button id="edok">Готово</button></div>
+<input id="edi" class="ovin" type="number" inputmode="decimal" hidden><span class="ovu" id="uE" hidden>мм</span>
+<div class="ed" id="ed" hidden><button id="edcancel" class="dng">Отмена</button><button id="edok">Готово</button></div>
 </div>
 <div class="card">
 <h2>Размеры</h2>
-<div class="g3" style="margin-bottom:8px">
-<label>a, b<select id="ua"><option value="мм">мм</option><option value="см">см</option><option value="м">м</option></select></label>
-<label>l<select id="ul"><option value="м">м</option><option value="см">см</option><option value="мм">мм</option></select></label><span></span></div>
 <div id="lists"></div>
 <button class="add" id="addList">Добавить список</button>
 <div class="hint">b — только если подоконник клином (края разной ширины). шт — если не указано, 1.</div>
@@ -178,7 +183,7 @@ button:disabled{opacity:.4}
 <button class="big pri" id="add">Добавить в заказ</button>
 <button class="big" id="pdf">Сохранить PDF</button>
 <button class="big pri" id="save" hidden>Сохранить изменения</button>
-<button class="big" id="cancel" hidden>Отмена</button>
+<button class="big dng" id="cancel" hidden>Отмена</button>
 </div>
 
 <div id="prev" hidden>
@@ -190,33 +195,29 @@ button:disabled{opacity:.4}
 </div>
 <div id="cust" hidden>
 <button class="back" id="bkC">← Назад</button>
-<h1>Произвольные детали</h1>
+<div class="hrow"><h1>Произвольные детали</h1><input id="cclr" type="text" placeholder="Цвет" autocapitalize="characters" autocomplete="off" aria-label="Цвет"></div>
 <div class="card">
-<div class="clr"><label>Цвет<input id="cclr" type="text" autocapitalize="characters" style="text-transform:uppercase"></label></div>
-<div id="cwrap" style="position:relative"><svg id="csk" viewBox="0 0 340 190" style="margin-top:44px;touch-action:pan-x pan-y" role="img"><title>Деталь</title></svg><input id="iA" class="ovin" type="number" inputmode="decimal" hidden><input id="iL" class="ovin" type="number" inputmode="decimal" hidden><input id="iH" class="ovin" type="number" inputmode="decimal" hidden><span class="ovu" id="uA" hidden>°</span><span class="ovu" id="uL" hidden>мм</span><span class="ovu" id="uH" hidden>мм</span></div>
+<div class="tools tbar"><button id="undo" aria-label="undo">↶</button><button id="redo" aria-label="redo">↷</button><button id="clrP" class="dng grow">Очистить</button><button id="saveT" class="grow">В шаблоны</button></div>
+<div id="cwrap" style="position:relative"><svg id="csk" viewBox="0 0 340 190" style="touch-action:pan-x pan-y" role="img"><title>Деталь</title></svg><input id="iA" class="ovin" type="number" inputmode="decimal" hidden><input id="iL" class="ovin" type="number" inputmode="decimal" hidden><input id="iH" class="ovin" type="number" inputmode="decimal" hidden><span class="ovu" id="uA" hidden>°</span><span class="ovu" id="uL" hidden>мм</span><span class="ovu" id="uH" hidden>мм</span></div>
+<div class="hint" style="margin:6px 0 0">Нажми на отрезок или угол, чтобы изменить. Плюс на конце открывает меню.</div>
 <div id="cpop" hidden><div class="pbox">
 <div id="pmenu" hidden>
 <button class="mb" id="mAdd">Добавить отрезок</button>
 <button class="mb" id="mSym">Скопировать всё зеркально</button>
 <button class="mb" id="mHem">Завершающий загиб</button>
-<button class="mb" id="mCancel">Отмена</button>
+<button class="mb dng" id="mCancel">Отмена</button>
 </div>
 </div></div>
-<div id="cbar" hidden class="prow" style="justify-content:center;margin-top:8px"><button id="flipJ">Сторона</button><button id="delS">Удалить отрезок</button><button id="delH">Удалить загиб</button><button id="cedok">Готово</button></div>
+<div id="cbar" hidden class="prow" style="justify-content:center;margin-top:8px"><button id="flipJ">Сторона</button><button id="delS" class="dng">Удалить отрезок</button><button id="delH" class="dng">Удалить загиб</button><button id="cedok">Готово</button></div>
 <div id="hint0" hidden class="hint">0° — прижато до конца</div>
-<div class="tools">
-<button id="undo" aria-label="undo">↶</button><button id="redo" aria-label="redo">↷</button><button id="rotL">↺</button><button id="rotR">↻</button><button id="mH" aria-label="flip horizontal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21" stroke-dasharray="2.5 2"/><path d="M10 6 L3 12 L10 18 Z"/><path d="M14 6 L21 12 L14 18 Z" fill="currentColor" fill-opacity=".35"/></svg></button><button id="mV" aria-label="flip vertical"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12" stroke-dasharray="2.5 2"/><path d="M6 10 L12 3 L18 10 Z"/><path d="M6 14 L12 21 L18 14 Z" fill="currentColor" fill-opacity=".35"/></svg></button>
-<button id="zOut">−</button><button id="zIn">+</button><button id="zFit">⤢</button>
-</div>
-<div class="hint">Нажми на отрезок или угол, чтобы изменить. Плюс на конце открывает меню.</div>
+<div class="tools2"><button id="rotL">↺</button><button id="rotR">↻</button><button id="mH" aria-label="flip horizontal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21" stroke-dasharray="2.5 2"/><path d="M10 6 L3 12 L10 18 Z"/><path d="M14 6 L21 12 L14 18 Z" fill="currentColor" fill-opacity=".35"/></svg></button><button id="mV" aria-label="flip vertical"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12" stroke-dasharray="2.5 2"/><path d="M6 10 L12 3 L18 10 Z"/><path d="M6 14 L12 21 L18 14 Z" fill="currentColor" fill-opacity=".35"/></svg></button><button id="zOut">−</button><button id="zIn">+</button><button id="zFit">⤢</button></div>
 </div>
 <div class="card"><h2>Размеры</h2>
-<div class="g3" style="margin-bottom:8px"><label>l<select id="cul"><option value="м">м</option><option value="см">см</option><option value="мм">мм</option></select></label><span></span><span></span></div>
 <div id="clists"></div>
 <button class="add" id="addCList">Добавить список</button></div>
 <button class="big pri" id="addC">Добавить в заказ</button>
 <button class="big pri" id="saveC" hidden>Сохранить изменения</button>
-<button class="big" id="cancelC" hidden>Отмена</button>
+<button class="big dng" id="cancelC" hidden>Отмена</button>
 </div>
 
 <div id="toast" hidden></div>
@@ -251,7 +252,38 @@ addEventListener('hashchange',()=>{const id=location.hash.slice(1)||'home';if(['
 function toast(t){const e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2200)}
 function two(b,label,fn){if(b.dataset.armed){clearTimeout(b._t);b.textContent=b.dataset.orig;delete b.dataset.armed;fn();return}b.dataset.orig=b.textContent;b.dataset.armed=1;b.textContent=label;b._t=setTimeout(()=>{b.textContent=b.dataset.orig;delete b.dataset.armed},3000)}
 function mark(k){['30','25','10'].forEach(n=>$('s'+n).setAttribute('stroke',n===k?'var(--ac)':'var(--fg)'))}
-function heads(){document.querySelectorAll('.ha').forEach(e=>e.textContent='a ('+du(cur.ua)+')');document.querySelectorAll('.hb').forEach(e=>e.textContent='b ('+du(cur.ua)+')');document.querySelectorAll('.hl').forEach(e=>e.textContent='l ('+du(cur.ul)+')')}
+function ub(k,u){return `<button class="un" data-uk="${k}">${du(u)}</button>`}
+function heads(){document.querySelectorAll('.ha').forEach(e=>e.innerHTML='a '+ub('ua',cur.ua));document.querySelectorAll('.hb').forEach(e=>e.innerHTML='b '+ub('ua',cur.ua));document.querySelectorAll('.hl').forEach(e=>e.innerHTML='l '+ub('ul',cur.ul))}
+// unit change: the decimal point is moved inside the typed text (mm=0, cm=1, m=3 powers of ten relative to mm)
+const UE={'мм':0,'см':1,'м':3};
+function shiftNum(v,k){v=String(v==null?'':v).trim();if(!v||!k)return v;
+  const m=v.match(/^(-?)(\d*)([.,]?)(\d*)$/);if(!m||(!m[2]&&!m[4]))return v;
+  const sg=m[1],sep=m[3]||',';let d=m[2]+m[4],p=m[2].length+k;
+  if(p>d.length)d+='0'.repeat(p-d.length);if(p<0){d='0'.repeat(-p)+d;p=0}
+  let i=d.slice(0,p).replace(/^0+/,'')||'0',f=d.slice(p).replace(/0+$/,'');
+  return sg+i+(f?sep+f:'')}
+function unitTarget(k){return k==='ua'?{o:cur,p:'ua',keys:['a','b'],L:cur.lists,redraw:lists}:k==='ul'?{o:cur,p:'ul',keys:['l'],L:cur.lists,redraw:lists}:{o:curC,p:'ul',keys:['l'],L:curC.lists,redraw:clists}}
+function changeUnit(btn,k,u){const t=unitTarget(k),from=t.o[t.p];if(u===from)return;
+  const has=t.L.some(L=>L.rows.some(r=>t.keys.some(x=>String(r[x]==null?'':r[x]).trim()!=='')));
+  const apply=conv=>{if(conv)t.L.forEach(L=>L.rows.forEach(r=>t.keys.forEach(x=>{r[x]=shiftNum(r[x],UE[from]-UE[u])})));t.o[t.p]=u;t.redraw()};
+  if(!has)apply(false);else askConv(btn,()=>apply(true),()=>apply(false))}
+function placePop(m,btn){const r=btn.getBoundingClientRect(),w=m.offsetWidth;let x=r.left+scrollX+r.width/2-w/2;x=Math.max(8,Math.min(x,document.documentElement.clientWidth-w-8));m.style.left=x+'px';m.style.top=(r.bottom+scrollY+6)+'px'}
+function askConv(btn,yes,no){closeUnit();const m=document.createElement('div');m.className='upop ask';
+  m.innerHTML='<div class="q">'+esc(T('Пересчитать введённые значения?'))+'</div><div class="yn"><button class="yes">'+esc(T('Да'))+'</button><button class="no">'+esc(T('Нет'))+'</button></div>';
+  m.querySelector('.yes').onclick=e=>{e.stopPropagation();closeUnit();yes()};m.querySelector('.no').onclick=e=>{e.stopPropagation();closeUnit();no()};
+  document.body.appendChild(m);m._for=btn;placePop(m,btn);upopEl=m}
+// small dropdown with units, opens under the tapped unit
+let upopEl=null;
+function closeUnit(){if(upopEl){upopEl.remove();upopEl=null}}
+function unitMenu(btn,now,pick){closeUnit();const m=document.createElement('div');m.className='upop';
+  ['мм','см','м'].forEach(u=>{const b=document.createElement('button');b.textContent=du(u);if(u===now)b.className='cur';b.onclick=e=>{e.stopPropagation();closeUnit();pick(u)};m.appendChild(b)});
+  document.body.appendChild(m);m._for=btn;
+  placePop(m,btn);upopEl=m}
+document.addEventListener('pointerdown',e=>{if(upopEl&&!upopEl.contains(e.target)&&!(e.target.closest&&e.target.closest('.un')))closeUnit()},true);
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.un');if(!b)return;
+  if(upopEl&&upopEl._for===b){closeUnit();return}
+  const k=b.dataset.uk;
+  unitMenu(b,unitTarget(k).o[unitTarget(k).p],u=>changeUnit(b,k,u))});
 function lists(){
   $('lists').innerHTML=cur.lists.map((L,li)=>`<div style="margin-bottom:16px">
 <div style="display:flex;gap:6px;margin-bottom:6px"><input data-li="${li}" data-k="c" value="${esc(L.c)}" placeholder="Комментарий к списку" style="text-align:left">${cur.lists.length>1?`<button class="x" data-dl="${li}">✕</button>`:''}</div>
@@ -267,8 +299,8 @@ function lists(){
 }
 function load(){
   ['30','25','10'].forEach(k=>$('t'+k).textContent=cur.p[k]);
-  $('clr').value=cur.clr;$('ua').value=cur.ua;$('ul').value=cur.ul;lists();
-  $('ed').hidden=true;mark(null);sel=null;
+  $('clr').value=cur.clr;lists();
+  endSkEdit();
   const e=editing!==null;
   $('add').hidden=e;$('pdf').hidden=e;$('save').hidden=!e;$('cancel').hidden=!e;
   $('stitle').textContent=e?'Подоконники: правка':'Подоконники';
@@ -331,7 +363,7 @@ function renderSheet(){
 }
 function renderHub(){
   $('oa').value=order.addr;$('on').value=order.name;$('oc').value=order.note;
-  $('blist').innerHTML=order.blocks.length?order.blocks.map((b,i)=>`<div class="row"><span>${i+1}. ${T(b.type==='cust'?'Произвольные детали':'Подоконники')}${b.clr?', '+esc(b.clr):''}, ${T('строк')}: ${filled(b).length}</span><span><button data-ed="${i}">Изменить</button> <button data-rm="${i}">Удалить</button></span></div>`).join(''):'<div class="hint">Пока нет блоков</div>';
+  $('blist').innerHTML=order.blocks.length?order.blocks.map((b,i)=>`<div class="row"><span>${i+1}. ${T(b.type==='cust'?'Произвольные детали':'Подоконники')}${b.clr?', '+esc(b.clr):''}, ${T('строк')}: ${filled(b).length}</span><span><button data-ed="${i}">Изменить</button> <button class="dng" data-rm="${i}">Удалить</button></span></div>`).join(''):'<div class="hint">Пока нет блоков</div>';
   $('goSill').textContent=T('Подоконники')+(draftFilled()?' '+T('(не закончен)'):'');
   $('goCust').textContent=T('Произвольные детали')+(draftCFilled()?' '+T('(не закончен)'):'');
 }
@@ -356,12 +388,32 @@ $('lists').addEventListener('click',e=>{
 });
 $('addList').onclick=()=>{cur.lists.push(nl());lists()};
 $('clr').addEventListener('input',e=>{const t=e.target,s=t.selectionStart;t.value=t.value.toUpperCase();t.setSelectionRange(s,s);cur.clr=t.value});
-$('ua').onchange=e=>{cur.ua=e.target.value;heads()};
-$('ul').onchange=e=>{cur.ul=e.target.value;heads()};
 $('sk').addEventListener('click',e=>{const el=e.target.closest('[data-k]');if(!el)return;
-  sel=el.dataset.k;mark(sel);$('edl').textContent=T('Размер {0}:',sel);$('edi').value=cur.p[sel];$('ed').hidden=false;$('edi').focus();$('edi').select()});
+  sel=el.dataset.k;skOld=cur.p[sel];mark(sel);$('edi').value=cur.p[sel];$('ed').hidden=false;showSkField();
+  const r=$('sk').getBoundingClientRect();if(Math.abs(r.top-12)>4)window.scrollBy({top:r.top-12,behavior:'auto'});
+  $('edi').focus();$('edi').select();[250,600].forEach(d=>setTimeout(skKeepButtons,d))});
 $('edi').addEventListener('input',e=>{if(sel){cur.p[sel]=e.target.value;$('t'+sel).textContent=e.target.value||'—'}});
-$('edok').onclick=()=>{$('ed').hidden=true;sel=null;mark(null)};
+let skOld='';
+const skShow=()=>['30','25','10'].forEach(n=>{const t=$('t'+n);if(t)t.style.visibility=''});
+function endSkEdit(){$('ed').hidden=true;$('edi').hidden=true;$('uE').hidden=true;skShow();sel=null;mark(null)}
+function cancelSkEdit(){if(sel){cur.p[sel]=skOld;$('t'+sel).textContent=skOld}endSkEdit();$('edi').blur()}
+$('edcancel').onclick=cancelSkEdit;
+// keep the Отмена/Готово row above the keyboard
+function skKeepButtons(){if($('ed').hidden)return;const r=$('ed').getBoundingClientRect(),h=window.visualViewport?window.visualViewport.height:innerHeight;if(r.bottom>h-8)window.scrollBy({top:r.bottom-h+8,behavior:'auto'})}
+if(window.visualViewport)window.visualViewport.addEventListener('resize',skKeepButtons);
+$('edok').onclick=endSkEdit;
+$('edi').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();endSkEdit();$('edi').blur()}});
+// input field on the 3D sketch: nearest free spot next to the tapped number, clear of lines and other numbers
+let skGeo=null;
+function skGeometry(){const pts=[];$('sk').querySelectorAll('line,polygon,polyline,path').forEach(el=>{if(!el.getTotalLength)return;let n;try{n=el.getTotalLength()}catch(e){return}for(let d=0;d<=n;d+=1.5){const p=el.getPointAtLength(d);pts.push([p.x,p.y])}});
+  return {pts,txts:[...$('sk').querySelectorAll('text')]}}
+function showSkField(){const svg=$('sk'),card=svg.closest('.card'),vb=svg.viewBox.baseVal,rs=svg.getBoundingClientRect(),rc=card.getBoundingClientRect(),kx=vb.width/rs.width;
+  if(!skGeo)skGeo=skGeometry();
+  skShow();const me=$('t'+sel),bb=me.getBBox(),c0=[bb.x+bb.width/2,bb.y+bb.height/2];
+  const L={lines:[],circ:[],pts:skGeo.pts,txts:skGeo.txts.map(x=>{const b=x.getBBox();return{c:[b.x+b.width/2,b.y+b.height/2],t:x.textContent,own:x===me}})};
+  const c=fitField(c0,c0,64*kx,26*kx,vb,kx,[],q=>q.own,false,L);
+  const px=rs.left-rc.left+(c[0]-vb.x)/vb.width*rs.width,py=rs.top-rc.top+(c[1]-vb.y)/vb.height*rs.height,el=$('edi'),u=$('uE');
+  el.style.left=px+'px';el.style.top=py+'px';u.style.left=(px+10)+'px';u.style.top=py+'px';u.textContent=du('мм');el.hidden=false;u.hidden=false;me.style.visibility='hidden'}
 $('add').onclick=()=>{
   if(!filled(cur).length){toast('Заполни хотя бы одну строку');return}
   order.blocks.push(cl(cur));draft=nd();cur=draft;load();show('hub');toast('Блок добавлен в заказ');
@@ -405,7 +457,7 @@ $('delO').onclick=e=>two(e.target,'Точно удалить заказ?',()=>{o
 let cfg={co:''};
 try{const c=JSON.parse(localStorage.getItem('zamery-cfg')||'null');if(c)cfg=Object.assign(cfg,c)}catch(e){}
 const saveCfg=()=>{try{localStorage.setItem('zamery-cfg',JSON.stringify(cfg))}catch(e){}};
-const D={"Настройки": ["Iestatījumi", "Settings"], "Новый заказ": ["Jauns pasūtījums", "New order"], "Продолжить": ["Turpināt", "Continue"], "Посмотреть текущий": ["Skatīt pašreizējo", "View current"], "Недописанный заказ запоминается на телефоне.": ["Nepabeigtais pasūtījums tiek saglabāts tālrunī.", "An unfinished order is kept on the phone."], "← Меню": ["← Izvēlne", "← Menu"], "← Назад": ["← Atpakaļ", "← Back"], "Название фирмы": ["Uzņēmuma nosaukums", "Company name"], "Подставляется в название файла после даты.": ["Tiek pievienots faila nosaukumam aiz datuma.", "Added to the file name after the date."], "Папка для PDF": ["PDF mape", "PDF folder"], "Выбрать папку": ["Izvēlēties mapi", "Choose folder"], "Сбросить": ["Atiestatīt", "Reset"], "Язык": ["Valoda", "Language"], "Язык PDF": ["PDF valoda", "PDF language"], "Выбери шаблон": ["Izvēlies veidni", "Choose a template"], "Подоконники": ["Palodzes", "Window sills"], "Произвольные детали": ["Brīvas detaļas", "Custom parts"], "Другие шаблоны появятся здесь.": ["Citas veidnes parādīsies šeit.", "Other templates will appear here."], "Заказ": ["Pasūtījums", "Order"], "Данные заказа": ["Pasūtījuma dati", "Order details"], "Адрес": ["Adrese", "Address"], "Имя": ["Vārds", "Name"], "Примечание": ["Piezīme", "Note"], "Блоки": ["Bloki", "Blocks"], "Добавить блок": ["Pievienot bloku", "Add block"], "Удалить заказ": ["Dzēst pasūtījumu", "Delete order"], "Цвет": ["Krāsa", "Colour"], "Нажми на размер или отрезок, чтобы изменить (мм)": ["Pieskaries izmēram vai malai, lai mainītu (mm)", "Tap a size or an edge to change it (mm)"], "Готово": ["Gatavs", "Done"], "Размеры": ["Izmēri", "Sizes"], "Добавить список": ["Pievienot sarakstu", "Add list"], "b — только если подоконник клином (края разной ширины). шт — если не указано, 1.": ["b — tikai ja palodze ir ķīļveida (malas dažāda platuma). gab. — ja nav norādīts, 1.", "b — only if the sill is tapered (edges of different width). pcs — 1 if not given."], "Добавить в заказ": ["Pievienot pasūtījumam", "Add to order"], "Сохранить PDF": ["Saglabāt PDF", "Save PDF"], "Сохранить изменения": ["Saglabāt izmaiņas", "Save changes"], "Отмена": ["Atcelt", "Cancel"], "Текущий заказ": ["Pašreizējais pasūtījums", "Current order"], "Подоконники: правка": ["Palodzes: labošana", "Window sills: editing"], "шт": ["gab.", "pcs"], "Добавить позицию": ["Pievienot pozīciju", "Add item"], "Изменить": ["Mainīt", "Edit"], "Удалить": ["Dzēst", "Delete"], "Пока нет блоков": ["Pagaidām nav bloku", "No blocks yet"], "Заказ пуст": ["Pasūtījums ir tukšs", "The order is empty"], "Комментарий к списку": ["Saraksta komentārs", "List comment"], "(не закончен)": ["(nepabeigts)", "(unfinished)"], "строк": ["rindas", "rows"], "Заполни хотя бы одну строку": ["Aizpildi vismaz vienu rindu", "Fill in at least one row"], "Блок добавлен в заказ": ["Bloks pievienots pasūtījumam", "Block added to the order"], "Изменения сохранены": ["Izmaiņas saglabātas", "Changes saved"], "Точно?": ["Tiešām?", "Sure?"], "Очистить текущий заказ?": ["Notīrīt pašreizējo pasūtījumu?", "Clear the current order?"], "Точно удалить заказ?": ["Tiešām dzēst pasūtījumu?", "Really delete the order?"], "Сохранение из раздела пока не готово": ["Saglabāšana no sadaļas vēl nav gatava", "Saving from a section is not ready yet"], "Не загрузилась библиотека PDF": ["PDF bibliotēka neielādējās", "The PDF library did not load"], "Готовлю PDF…": ["Gatavoju PDF…", "Preparing PDF…"], "PDF сохранён": ["PDF saglabāts", "PDF saved"], "PDF сохранён в выбранную папку": ["PDF saglabāts izvēlētajā mapē", "PDF saved to the chosen folder"], "Сохранение отменено": ["Saglabāšana atcelta", "Saving cancelled"], "Не удалось сохранить PDF": ["Neizdevās saglabāt PDF", "Could not save the PDF"], "Папка недоступна. Сохраняю в папку Загрузки.": ["Mape nav pieejama. Saglabāju mapē Lejupielādes.", "Folder unavailable. Saving to the Downloads folder."], "Выбор папки здесь не поддерживается": ["Mapes izvēle šeit netiek atbalstīta", "Choosing a folder is not supported here"], "Папка выбрана": ["Mape izvēlēta", "Folder chosen"], "Не получилось выбрать папку": ["Neizdevās izvēlēties mapi", "Could not choose the folder"], "Файлы сохраняются в папку Загрузки.": ["Faili tiek saglabāti mapē Lejupielādes.", "Files are saved to the Downloads folder."], "Выбери папку, которую создал заранее. Корневые папки (Загрузки, Документы) браузер может не разрешить.": ["Izvēlies iepriekš izveidotu mapi. Pārlūks var neatļaut saknes mapes (Lejupielādes, Dokumenti).", "Choose a folder you created in advance. The browser may not allow top-level folders (Downloads, Documents)."], "Этот браузер не умеет выбирать папку. Файлы сохраняются в папку Загрузки.": ["Šis pārlūks nevar izvēlēties mapi. Faili tiek saglabāti mapē Lejupielādes.", "This browser cannot choose a folder. Files are saved to the Downloads folder."], "мм": ["mm", "mm"], "см": ["cm", "cm"], "м": ["m", "m"], "Размер {0}:": ["Izmērs {0}:", "Size {0}:"], "В работе: заказ от {0}, блоков: {1}": ["Darbā: pasūtījums no {0}, bloki: {1}", "In progress: order from {0}, blocks: {1}"], "Заказа в работе нет": ["Nav pasūtījuma darbā", "No order in progress"], "Папка: {0}": ["Mape: {0}", "Folder: {0}"], "Файл: {0}": ["Fails: {0}", "File: {0}"], "Нажми на отрезок или угол, чтобы изменить. Плюс на конце добавляет отрезок.": ["Pieskaries malai vai leņķim, lai mainītu. Pluss galā pievieno malu.", "Tap an edge or an angle to change it. The plus at an end adds an edge."], "Угол между отрезками, °": ["Leņķis starp malām, °", "Angle between edges, °"], "Длина отрезка, мм": ["Malas garums, mm", "Edge length, mm"], "Сторона": ["Puse", "Side"], "Удалить отрезок": ["Dzēst malu", "Delete edge"], "Зеркало": ["Spogulis", "Mirror"], "Нажми на отрезок или угол, чтобы изменить. Плюс на конце открывает меню.": ["Pieskaries malai vai leņķim, lai mainītu. Pluss galā atver izvēlni.", "Tap an edge or an angle to change it. The plus at an end opens a menu."], "Добавить отрезок": ["Pievienot malu", "Add edge"], "Скопировать всё зеркально": ["Kopēt visu spoguļveidā", "Mirror-copy everything"], "Завершающий загиб": ["Noslēdzošais salocījums", "Final hem"], "Длина загиба, мм": ["Salocījuma garums, mm", "Hem length, mm"], "Удалить загиб": ["Dzēst salocījumu", "Delete hem"], "0° — прижато до конца": ["0° — piespiests līdz galam", "0° — pressed flat"], "Сначала нажми на угол — ось симметрии": ["Vispirms pieskaries leņķim — simetrijas asij", "First tap the angle that is the axis of symmetry"]};
+const D={"Пересчитать введённые значения?": ["Pārrēķināt ievadītās vērtības?", "Convert the entered values?"], "Да": ["Jā", "Yes"], "Нет": ["Nē", "No"], "Очистить": ["Notīrīt", "Clear"], "В шаблоны": ["Uz veidnēm", "To templates"], "Сохранение в шаблоны будет позже": ["Saglabāšana veidnēs būs vēlāk", "Saving to templates will come later"], "Настройки": ["Iestatījumi", "Settings"], "Новый заказ": ["Jauns pasūtījums", "New order"], "Продолжить": ["Turpināt", "Continue"], "Посмотреть текущий": ["Skatīt pašreizējo", "View current"], "Недописанный заказ запоминается на телефоне.": ["Nepabeigtais pasūtījums tiek saglabāts tālrunī.", "An unfinished order is kept on the phone."], "← Меню": ["← Izvēlne", "← Menu"], "← Назад": ["← Atpakaļ", "← Back"], "Название фирмы": ["Uzņēmuma nosaukums", "Company name"], "Подставляется в название файла после даты.": ["Tiek pievienots faila nosaukumam aiz datuma.", "Added to the file name after the date."], "Папка для PDF": ["PDF mape", "PDF folder"], "Выбрать папку": ["Izvēlēties mapi", "Choose folder"], "Сбросить": ["Atiestatīt", "Reset"], "Язык": ["Valoda", "Language"], "Язык PDF": ["PDF valoda", "PDF language"], "Выбери шаблон": ["Izvēlies veidni", "Choose a template"], "Подоконники": ["Palodzes", "Window sills"], "Произвольные детали": ["Brīvas detaļas", "Custom parts"], "Другие шаблоны появятся здесь.": ["Citas veidnes parādīsies šeit.", "Other templates will appear here."], "Заказ": ["Pasūtījums", "Order"], "Данные заказа": ["Pasūtījuma dati", "Order details"], "Адрес": ["Adrese", "Address"], "Имя": ["Vārds", "Name"], "Примечание": ["Piezīme", "Note"], "Блоки": ["Bloki", "Blocks"], "Добавить блок": ["Pievienot bloku", "Add block"], "Удалить заказ": ["Dzēst pasūtījumu", "Delete order"], "Цвет": ["Krāsa", "Colour"], "Нажми на размер или отрезок, чтобы изменить (мм)": ["Pieskaries izmēram vai malai, lai mainītu (mm)", "Tap a size or an edge to change it (mm)"], "Готово": ["Gatavs", "Done"], "Размеры": ["Izmēri", "Sizes"], "Добавить список": ["Pievienot sarakstu", "Add list"], "b — только если подоконник клином (края разной ширины). шт — если не указано, 1.": ["b — tikai ja palodze ir ķīļveida (malas dažāda platuma). gab. — ja nav norādīts, 1.", "b — only if the sill is tapered (edges of different width). pcs — 1 if not given."], "Добавить в заказ": ["Pievienot pasūtījumam", "Add to order"], "Сохранить PDF": ["Saglabāt PDF", "Save PDF"], "Сохранить изменения": ["Saglabāt izmaiņas", "Save changes"], "Отмена": ["Atcelt", "Cancel"], "Текущий заказ": ["Pašreizējais pasūtījums", "Current order"], "Подоконники: правка": ["Palodzes: labošana", "Window sills: editing"], "шт": ["gab.", "pcs"], "Добавить позицию": ["Pievienot pozīciju", "Add item"], "Изменить": ["Mainīt", "Edit"], "Удалить": ["Dzēst", "Delete"], "Пока нет блоков": ["Pagaidām nav bloku", "No blocks yet"], "Заказ пуст": ["Pasūtījums ir tukšs", "The order is empty"], "Комментарий к списку": ["Saraksta komentārs", "List comment"], "(не закончен)": ["(nepabeigts)", "(unfinished)"], "строк": ["rindas", "rows"], "Заполни хотя бы одну строку": ["Aizpildi vismaz vienu rindu", "Fill in at least one row"], "Блок добавлен в заказ": ["Bloks pievienots pasūtījumam", "Block added to the order"], "Изменения сохранены": ["Izmaiņas saglabātas", "Changes saved"], "Точно?": ["Tiešām?", "Sure?"], "Очистить текущий заказ?": ["Notīrīt pašreizējo pasūtījumu?", "Clear the current order?"], "Точно удалить заказ?": ["Tiešām dzēst pasūtījumu?", "Really delete the order?"], "Сохранение из раздела пока не готово": ["Saglabāšana no sadaļas vēl nav gatava", "Saving from a section is not ready yet"], "Не загрузилась библиотека PDF": ["PDF bibliotēka neielādējās", "The PDF library did not load"], "Готовлю PDF…": ["Gatavoju PDF…", "Preparing PDF…"], "PDF сохранён": ["PDF saglabāts", "PDF saved"], "PDF сохранён в выбранную папку": ["PDF saglabāts izvēlētajā mapē", "PDF saved to the chosen folder"], "Сохранение отменено": ["Saglabāšana atcelta", "Saving cancelled"], "Не удалось сохранить PDF": ["Neizdevās saglabāt PDF", "Could not save the PDF"], "Папка недоступна. Сохраняю в папку Загрузки.": ["Mape nav pieejama. Saglabāju mapē Lejupielādes.", "Folder unavailable. Saving to the Downloads folder."], "Выбор папки здесь не поддерживается": ["Mapes izvēle šeit netiek atbalstīta", "Choosing a folder is not supported here"], "Папка выбрана": ["Mape izvēlēta", "Folder chosen"], "Не получилось выбрать папку": ["Neizdevās izvēlēties mapi", "Could not choose the folder"], "Файлы сохраняются в папку Загрузки.": ["Faili tiek saglabāti mapē Lejupielādes.", "Files are saved to the Downloads folder."], "Выбери папку, которую создал заранее. Корневые папки (Загрузки, Документы) браузер может не разрешить.": ["Izvēlies iepriekš izveidotu mapi. Pārlūks var neatļaut saknes mapes (Lejupielādes, Dokumenti).", "Choose a folder you created in advance. The browser may not allow top-level folders (Downloads, Documents)."], "Этот браузер не умеет выбирать папку. Файлы сохраняются в папку Загрузки.": ["Šis pārlūks nevar izvēlēties mapi. Faili tiek saglabāti mapē Lejupielādes.", "This browser cannot choose a folder. Files are saved to the Downloads folder."], "мм": ["mm", "mm"], "см": ["cm", "cm"], "м": ["m", "m"], "Размер {0}:": ["Izmērs {0}:", "Size {0}:"], "В работе: заказ от {0}, блоков: {1}": ["Darbā: pasūtījums no {0}, bloki: {1}", "In progress: order from {0}, blocks: {1}"], "Заказа в работе нет": ["Nav pasūtījuma darbā", "No order in progress"], "Папка: {0}": ["Mape: {0}", "Folder: {0}"], "Файл: {0}": ["Fails: {0}", "File: {0}"], "Нажми на отрезок или угол, чтобы изменить. Плюс на конце добавляет отрезок.": ["Pieskaries malai vai leņķim, lai mainītu. Pluss galā pievieno malu.", "Tap an edge or an angle to change it. The plus at an end adds an edge."], "Угол между отрезками, °": ["Leņķis starp malām, °", "Angle between edges, °"], "Длина отрезка, мм": ["Malas garums, mm", "Edge length, mm"], "Сторона": ["Puse", "Side"], "Удалить отрезок": ["Dzēst malu", "Delete edge"], "Зеркало": ["Spogulis", "Mirror"], "Нажми на отрезок или угол, чтобы изменить. Плюс на конце открывает меню.": ["Pieskaries malai vai leņķim, lai mainītu. Pluss galā atver izvēlni.", "Tap an edge or an angle to change it. The plus at an end opens a menu."], "Добавить отрезок": ["Pievienot malu", "Add edge"], "Скопировать всё зеркально": ["Kopēt visu spoguļveidā", "Mirror-copy everything"], "Завершающий загиб": ["Noslēdzošais salocījums", "Final hem"], "Длина загиба, мм": ["Salocījuma garums, mm", "Hem length, mm"], "Удалить загиб": ["Dzēst salocījumu", "Delete hem"], "0° — прижато до конца": ["0° — piespiests līdz galam", "0° — pressed flat"], "Сначала нажми на угол — ось симметрии": ["Vispirms pieskaries leņķim — simetrijas asij", "First tap the angle that is the axis of symmetry"]};
 let lang=cfg.lang||((navigator.language||'ru').slice(0,2));if(!['ru','lv','en'].includes(lang))lang='en';
 const T=(ru,...a)=>{const d=D[ru];let t=(lang==='ru'||!d)?ru:d[lang==='lv'?0:1];a.forEach((v,i)=>{t=t.replace('{'+i+'}',v)});return t};
 const du=u=>lang==='ru'?u:un(u);
@@ -567,8 +619,8 @@ function drawC(){
       const nx=Math.max(a[0]-w/2+mx,Math.min(a[0]+w/2-mx,view.cx)),ny=Math.max(a[1]-h/2+my,Math.min(a[1]+h/2-my,view.cy));
       if(nx!==view.cx||ny!==view.cy){view.cx=nx;view.cy=ny;applyView();run()}}}
   placeInputs()}
-function fitField(anc,c0,bw,bh,vb,kx,placed,isSel,out){
-  const mg=3*kx,L=labs,hw=bw/2,hh=bh/2;
+function fitField(anc,c0,bw,bh,vb,kx,placed,isSel,out,LL){
+  const mg=3*kx,L=LL||labs,hw=bw/2,hh=bh/2;
   if(!L.lines||!anc)return c0;
   const rc=(cx,cy,m)=>({x0:cx-hw-m,y0:cy-hh-m,x1:cx+hw+m,y1:cy+hh+m});
   const dR=(x,y,r)=>Math.hypot(Math.max(r.x0-x,0,x-r.x1),Math.max(r.y0-y,0,y-r.y1));
@@ -616,6 +668,8 @@ function placeInputs(){
     else{if(!el.hidden)el.hidden=true;if(!u.hidden)u.hidden=true}}
   $('uA').textContent='°';$('uL').textContent=du('мм');$('uH').textContent=du('мм');
 }
+$('clrP').onclick=()=>{pushUndo();curC.part={segs:[100],joints:[],rot:0,hemS:null,hemE:null,anc:0};selC=null;axisJ=null;autoAxis=false;closePop();drawC()};
+$('saveT').onclick=()=>toast(T('Сохранение в шаблоны будет позже'));
 const toSketch=()=>{const r=$('cwrap').getBoundingClientRect();window.scrollBy({top:r.top-8,behavior:'auto'})};
 ['iA','iL','iH'].forEach(id=>$(id).addEventListener('focus',()=>{setTimeout(toSketch,60);setTimeout(toSketch,350)}));
 if(window.visualViewport)visualViewport.addEventListener('resize',()=>{const a=document.activeElement;if(a&&a.classList&&a.classList.contains('ovin'))toSketch()});
@@ -720,11 +774,10 @@ $('csk').addEventListener('touchmove',e=>{if(e.touches.length===2&&pinch){e.prev
   view.z=Math.max(1,Math.min(8,view.z*n.d/pinch.d));const k=r.width/(340/view.z);view.cx-=(n.x-pinch.x)/k;view.cy-=(n.y-pinch.y)/k;pinch=n;drawC()}},{passive:false});
 $('csk').addEventListener('touchend',e=>{if(e.touches.length<2)pinch=null});
 $('cclr').addEventListener('input',e=>{const t=e.target,p=t.selectionStart;t.value=t.value.toUpperCase();t.setSelectionRange(p,p);curC.clr=t.value});
-$('cul').onchange=e=>{curC.ul=e.target.value;clists()};
 function clists(){
   $('clists').innerHTML=curC.lists.map((L,li)=>`<div style="margin-bottom:16px">
 <div style="display:flex;gap:6px;margin-bottom:6px"><input data-li="${li}" data-k="c" value="${esc(L.c)}" placeholder="Комментарий к списку" style="text-align:left">${curC.lists.length>1?`<button class="x" data-dl="${li}">✕</button>`:''}</div>
-<table><thead><tr><th></th><th>l (${du(curC.ul)})</th><th>шт</th><th></th></tr></thead><tbody>`+
+<table><thead><tr><th></th><th>l ${ub('cul',curC.ul)}</th><th>шт</th><th></th></tr></thead><tbody>`+
   L.rows.map((r,i)=>`<tr><td><span class="n">${i+1}</span></td>
 <td><input data-li="${li}" data-i="${i}" data-k="l" value="${esc(r.l)}" inputmode="decimal"></td>
 <td><input data-li="${li}" data-i="${i}" data-k="q" value="${esc(r.q)}" placeholder="1" inputmode="numeric"></td>
@@ -738,7 +791,7 @@ $('clists').addEventListener('click',e=>{const t=e.target,x=t.dataset;
   else if(x.dl!==undefined)two(t,'Точно?',()=>{curC.lists.splice(+x.dl,1);clists()})});
 $('addCList').onclick=()=>{curC.lists.push({c:'',rows:[{l:'',q:''}]});clists()};
 function loadC(){
-  $('cclr').value=curC.clr;$('cul').value=curC.ul;selC=null;axisJ=null;autoAxis=false;undoS=[];redoS=[];updUndo();menuEnd=null;$('cpop').hidden=true;view={z:1,cx:170,cy:95};viewPre=null;drawC();clists();
+  $('cclr').value=curC.clr;selC=null;axisJ=null;autoAxis=false;undoS=[];redoS=[];updUndo();menuEnd=null;$('cpop').hidden=true;view={z:1,cx:170,cy:95};viewPre=null;drawC();clists();
   const e=editing!==null&&et==='cust';
   $('addC').hidden=e;$('saveC').hidden=!e;$('cancelC').hidden=!e;
 }
